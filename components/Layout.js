@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import { Global } from '@emotion/core';
-import reset from '../theme/reset';
-import { typography } from '../theme';
+import base from '../theme/base';
+import { globalStyles } from '../theme/nybraswire';
 
 const Layout = ({ children }) => (
   <div>
-    <Global styles={reset} />
-    <Global styles={typography} />
+    <Global styles={base} />
+    <Global styles={globalStyles} />
 
     <header>
       <nav>

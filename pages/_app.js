@@ -2,7 +2,7 @@ import React from 'react';
 import App, { Container } from 'next/app';
 import { ThemeProvider } from 'emotion-theming';
 import fb from '../firebase';
-import * as theme from '../theme';
+import { theme } from '../theme/nybraswire';
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
