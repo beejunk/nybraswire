@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import ReactMarkdown from 'react-markdown';
 import Layout from '../components/Layout';
 
 const Posts = ({ title = '', body = '' }) => (
@@ -10,9 +11,7 @@ const Posts = ({ title = '', body = '' }) => (
 
       <h1>{title}</h1>
 
-      <p>
-        {body}
-      </p>
+      <ReactMarkdown source={body} />
     </article>
   </Layout>
 );
