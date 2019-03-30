@@ -4,7 +4,25 @@ import colors from './colors';
 export default css({
   html: {
     fontSize: 15,
-    fontFamily: 'Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif',
+    fontFamily: [
+      'Frutiger',
+      '"Frutiger Linotype"',
+      'Univers',
+      'Calibri',
+      '"Gill Sans"',
+      '"Gill Sans MT"',
+      '"Myriad Pro"',
+      'Myriad',
+      '"DejaVu Sans Condensed"',
+      '"Liberation Sans"',
+      '"Nimbus Sans L"',
+      'Tahoma',
+      'Geneva',
+      '"Helvetica Neue"',
+      'Helvetica',
+      'Arial',
+      'sans-serif',
+    ].join(', '),
   },
 
   h1: {

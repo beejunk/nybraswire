@@ -9,16 +9,22 @@ const Layout = ({ children }) => (
     <Global styles={globalStyles} />
 
     <header>
-      <nav>
-        <Link href="/">
-          <a>Home</a>
-        </Link>
-      </nav>
+      <p>Logo</p>
     </header>
+
+    <nav>
+      <Link href="/">
+        <a>Home</a>
+      </Link>
+    </nav>
 
     <main>
       {children}
     </main>
+
+    <footer>
+      <p>Copyright</p>
+    </footer>
   </div>
 );
 
