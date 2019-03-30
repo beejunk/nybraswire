@@ -29,10 +29,10 @@ const Index = ({ posts = [] }) => {
 
       <style jsx>
         {`
-        h1 {
-          color: ${theme.colors.primary}
-        }
-      `}
+          h1 {
+            color: ${theme.colors.primary}
+          }
+        `}
       </style>
     </Layout>
   );
