@@ -1,7 +1,7 @@
 import React from 'react';
 import App, { Container } from 'next/app';
-import { ThemeProvider } from 'emotion-theming';
 import fb from '../firebase';
+import ThemeContext from '../theme';
 import { theme } from '../theme/nybraswire';
 
 class MyApp extends App {
@@ -20,9 +20,9 @@ class MyApp extends App {
 
     return (
       <Container>
-        <ThemeProvider theme={theme}>
+        <ThemeContext.Provider value={theme}>
           <Component {...pageProps} />
-        </ThemeProvider>
+        </ThemeContext.Provider>
       </Container>
     );
   }

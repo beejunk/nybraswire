@@ -1,9 +1,10 @@
-import { css } from '@emotion/core';
-import typography from './typography';
+import Typography from './Typography';
 import colors from './colors';
 
-export const globalStyles = css(
-  typography,
+export const GlobalStyles = () => (
+  <>
+    <Typography />
+  </>
 );
 
 export const theme = {
