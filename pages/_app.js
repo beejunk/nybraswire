@@ -2,7 +2,7 @@ import React from 'react';
 import App, { Container } from 'next/app';
 import fb from '../firebase';
 import ThemeContext from '../theme';
-import { theme } from '../theme/nybraswire';
+import { GlobalStyles, theme } from '../theme/nybraswire';
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
@@ -23,6 +23,8 @@ class MyApp extends App {
         <ThemeContext.Provider value={theme}>
           <Component {...pageProps} />
         </ThemeContext.Provider>
+
+        <GlobalStyles />
       </Container>
     );
   }

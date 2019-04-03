@@ -19,7 +19,8 @@
     "next": "^8.0.3",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
-    "react-markdown": "^4.0.6"
+    "react-markdown": "^4.0.6",
+    "styled-jsx": "^3.2.1"
   },
   "devDependencies": {
     "eslint": "^5.15.3",

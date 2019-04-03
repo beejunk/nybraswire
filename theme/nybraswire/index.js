@@ -1,8 +1,10 @@
-import Typography from './Typography';
 import colors from './colors';
+import Reset from './Reset';
+import Typography from './Typography';
 
 export const GlobalStyles = () => (
   <>
+    <Reset />
     <Typography />
   </>
 );
