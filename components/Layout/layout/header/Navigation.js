@@ -5,7 +5,11 @@ import {
 } from 'reactstrap';
 
 const Navigation = () => (
-  <Navbar dark color="primary">
+  <Navbar
+    css={{ flexGrow: 1 }}
+    dark
+    color="primary"
+  >
     <NavbarBrand
       tag={props => (
         <Link href="/">

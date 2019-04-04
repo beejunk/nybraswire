@@ -1,9 +1,18 @@
-import HeaderImage from './header/HeaderImage';
 import Navigation from './header/Navigation';
 
 const Header = () => (
-  <header className="Header">
-    <HeaderImage />
+  <header
+    className="Header"
+    css={{
+      backgroundImage: 'url(/static/images/header.jpg)',
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      height: '30vh',
+      maxHeight: '300px',
+      display: 'flex',
+      alignItems: 'flex-end',
+    }}
+  >
     <Navigation />
   </header>
 );
