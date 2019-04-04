@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import { theme } from './nybraswire';
+import theme from './nybraswire';
 
 const ThemeContext = createContext(theme);
 

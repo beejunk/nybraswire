@@ -1,14 +1,6 @@
 import colors from './colors';
-import Reset from './Reset';
-import Typography from './Typography';
+import './sass/theme.scss';
 
-export const GlobalStyles = () => (
-  <>
-    <Reset />
-    <Typography />
-  </>
-);
-
-export const theme = {
+export default {
   colors,
 };

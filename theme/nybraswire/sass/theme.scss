@@ -1,0 +1,11 @@
+// Colors
+$primary:       rgba(113, 62, 90, 1);
+$secondary:     rgba(99, 163, 117, 1);
+$info:          rgba(237, 199, 155, 1);
+$warning:       rgba(213, 122, 102, 1);
+$danger:        rgba(202, 102, 128, 1);
+
+// Typography
+$font-family-sans-serif: Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@import '~bootstrap/scss/bootstrap';
