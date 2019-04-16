@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Head from 'next/head';
 import Layout from '../components/Layout';
+import firebase from '../firebase';
 
 const Index = ({ posts = [] }) => (
   <Layout>
@@ -24,8 +25,8 @@ const Index = ({ posts = [] }) => (
   </Layout>
 );
 
-Index.getInitialProps = async (context, fb) => {
-  const querySnapshot = await fb.db.collection('posts').get();
+Index.getInitialProps = async () => {
+  const querySnapshot = await firebase.firestore().collection('posts').get();
   const posts = [];
   querySnapshot.forEach(doc => posts.push({ ...doc.data(), id: doc.id }));
 

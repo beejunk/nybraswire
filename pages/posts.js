@@ -1,6 +1,7 @@
 import Head from 'next/head';
 import ReactMarkdown from 'react-markdown';
 import Layout from '../components/Layout';
+import firebase from '../firebase';
 
 const Posts = ({ title = '', body = '' }) => (
   <Layout>
@@ -16,9 +17,9 @@ const Posts = ({ title = '', body = '' }) => (
   </Layout>
 );
 
-Posts.getInitialProps = async (context, fb) => {
+Posts.getInitialProps = async (context) => {
   const { id } = context.query;
-  const post = await fb.db.collection('posts').doc(id).get();
+  const post = await firebase.firestore().collection('posts').doc(id).get();
 
   return post.data();
 };
