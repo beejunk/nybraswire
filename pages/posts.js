@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import ReactMarkdown from 'react-markdown';
-import Layout from '../components/Layout';
+import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 
 const Posts = ({ title = '', body = '' }) => (

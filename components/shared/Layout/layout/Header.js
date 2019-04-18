@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import Navigation from './header/Navigation';
-import ThemeContext from '../../../theme';
+import ThemeContext from '../../../../theme';
 
 const Header = () => {
   const { header } = useContext(ThemeContext);

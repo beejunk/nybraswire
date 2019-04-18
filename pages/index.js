@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Head from 'next/head';
-import Layout from '../components/Layout';
+import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 
 const Index = ({ posts = [] }) => (
