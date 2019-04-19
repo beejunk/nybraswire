@@ -5,15 +5,13 @@ const withAuth = (WrappedComponent) => {
   const AuthContainer = (props) => {
     const [user, setUser] = useState();
 
-    useEffect(() => {
-      firebase.auth().onAuthStateChanged((loggedInUser) => {
-        if (loggedInUser) {
-          setUser(loggedInUser);
-        } else {
-          setUser();
-        }
-      });
-    });
+    useEffect(() => firebase.auth().onAuthStateChanged((loggedInUser) => {
+      if (loggedInUser) {
+        setUser(loggedInUser);
+      } else {
+        setUser();
+      }
+    }));
 
     return <WrappedComponent {...props} user={user} />;
   };

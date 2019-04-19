@@ -14,6 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@emotion/core": "^10.0.10",
+    "@zeit/next-css": "^1.0.1",
     "@zeit/next-sass": "^1.0.1",
     "bootstrap": "^4.3.1",
     "dotenv": "^7.0.0",
@@ -23,6 +24,7 @@
     "node-sass": "^4.11.0",
     "react": "^16.8.4",
     "react-dom": "^16.8.4",
+    "react-firebaseui": "^3.1.2",
     "react-markdown": "^4.0.6",
     "reactstrap": "^8.0.0"
   },
@@ -32,6 +34,7 @@
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-react": "^7.12.4"
+    "eslint-plugin-react": "^7.12.4",
+    "eslint-plugin-react-hooks": "^1.6.0"
   }
 }

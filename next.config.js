@@ -1,9 +1,10 @@
 const dotenv = require('dotenv');
 const withSass = require('@zeit/next-sass');
+const withCSS = require('@zeit/next-css');
 
 dotenv.config();
 
-module.exports = withSass({
+module.exports = withSass(withCSS({
   env: {
     firebase: {
       apiKey: process.env.FB_API_KEY,
@@ -14,4 +15,4 @@ module.exports = withSass({
       messagingSenderId: process.env.FB_MESSAGING_SENDER_ID,
     },
   },
-});
+}));

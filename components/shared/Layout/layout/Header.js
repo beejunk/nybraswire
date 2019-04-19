@@ -16,6 +16,7 @@ const Header = () => {
         maxHeight: '300px',
         display: 'flex',
         alignItems: 'flex-end',
+        marginBottom: '15px',
       }}
     >
       <Navigation />

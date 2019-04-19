@@ -1,10 +1,19 @@
 import Link from 'next/link';
 import {
+  Button,
   Navbar,
   NavbarBrand,
+  Nav,
+  NavItem,
 } from 'reactstrap';
+import withAuth from '../../../withAuth';
+import firebase from '../../../../../firebase';
 
-const Navigation = () => (
+const logout = () => {
+  firebase.auth().signOut();
+};
+
+const Navigation = ({ user }) => (
   <Navbar
     css={{ flexGrow: 1 }}
     dark
@@ -23,7 +32,17 @@ const Navigation = () => (
         </Link>
       )}
     />
+
+    {user && (
+      <Nav>
+        <NavItem>
+          <Button onClick={logout} color="info">
+            Log out
+          </Button>
+        </NavItem>
+      </Nav>
+    )}
   </Navbar>
 );
 
-export default Navigation;
+export default withAuth(Navigation);
