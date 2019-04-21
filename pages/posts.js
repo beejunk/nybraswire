@@ -1,15 +1,10 @@
-import Head from 'next/head';
 import ReactMarkdown from 'react-markdown';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 
 const Posts = ({ title = '', body = '' }) => (
-  <Layout>
+  <Layout title={title}>
     <article>
-      <Head>
-        <title>{title}</title>
-      </Head>
-
       <h1>{title}</h1>
 
       <ReactMarkdown source={body} />

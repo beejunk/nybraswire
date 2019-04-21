@@ -1,14 +1,9 @@
 import Link from 'next/link';
-import Head from 'next/head';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 
 const Index = ({ posts = [] }) => (
-  <Layout>
-    <Head>
-      <title>Recent Posts</title>
-    </Head>
-
+  <Layout title="Recent Poasts">
     <h1>
         Recent Posts
     </h1>

@@ -1,8 +1,13 @@
+import Head from 'next/head';
 import { Container } from 'reactstrap';
 import Header from './layout/Header';
 
-const Layout = ({ children }) => (
+const Layout = ({ title, children }) => (
   <div className="Layout">
+    <Head>
+      <title>{title}</title>
+    </Head>
+
     <Header />
 
     <main>

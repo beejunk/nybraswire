@@ -13,7 +13,7 @@ const uiConfig = {
 };
 
 const Login = ({ user }) => (
-  <Layout>
+  <Layout title="Login">
     <Row className="Login">
       {user ? (
         <Col>
