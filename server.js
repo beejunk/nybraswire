@@ -1,5 +1,6 @@
 const express = require('express');
 const next = require('next');
+const routes = require('./routes');
 
 const { PORT = 3000 } = process.env;
 
@@ -17,11 +18,7 @@ const main = async () => {
 
   const server = express();
 
-  server.get('/posts/:id', (req, res) => {
-    const actualPage = '/posts';
-    const queryParams = { id: req.params.id };
-    app.render(req, res, actualPage, queryParams);
-  });
+  server.use('/posts', routes.posts(app));
 
   server.get('*', (req, res) => handle(req, res));
 

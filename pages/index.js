@@ -1,22 +1,33 @@
 import Link from 'next/link';
+import { Col, Row } from 'reactstrap';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 
-const Index = ({ posts = [] }) => (
-  <Layout title="Recent Poasts">
-    <h1>
-        Recent Posts
-    </h1>
+const PAGE_TITLE = 'Recent Posts';
 
-    <ul>
-      {posts.map(post => (
-        <li key={post.id}>
-          <Link as={`/posts/${post.id}`} href={`/posts?id=${post.id}`}>
-            <a>{post.title}</a>
-          </Link>
-        </li>
-      ))}
-    </ul>
+const Index = ({ posts = [] }) => (
+  <Layout title={PAGE_TITLE}>
+    <Row>
+      <Col>
+        <h1>
+          {PAGE_TITLE}
+        </h1>
+      </Col>
+    </Row>
+
+    <Row>
+      <Col>
+        <ul>
+          {posts.map(post => (
+            <li key={post.id}>
+              <Link as={`/posts/${post.id}`} href={`/posts?id=${post.id}`}>
+                <a>{post.title}</a>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </Col>
+    </Row>
   </Layout>
 );
 
