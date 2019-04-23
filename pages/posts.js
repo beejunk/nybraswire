@@ -1,18 +1,19 @@
-import ReactMarkdown from 'react-markdown';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
+import PostArticle from '../components/posts/PostArticle';
 import PostEditor from '../components/posts/PostEditor';
 
-const Posts = ({ title = '', body = '', edit = false }) => (
+const Posts = ({
+  title = '',
+  body = '',
+  edit = false,
+  id = '',
+}) => (
   <Layout title={title}>
     {edit ? (
-      <PostEditor title={title} body={body} />
+      <PostEditor title={title} body={body} id={id} />
     ) : (
-      <article>
-        <h1>{title}</h1>
-
-        <ReactMarkdown source={body} />
-      </article>
+      <PostArticle id={id} title={title} body={body} />
     )}
   </Layout>
 );
@@ -21,7 +22,7 @@ Posts.getInitialProps = async (context) => {
   const { id, edit } = context.query;
   const post = await firebase.firestore().collection('posts').doc(id).get();
 
-  return { ...post.data(), edit };
+  return { ...post.data(), edit, id };
 };
 
 export default Posts;
