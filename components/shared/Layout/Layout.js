@@ -11,7 +11,7 @@ const Layout = ({ title, children }) => (
     <Header />
 
     <Container>
-      <main>
+      <main css={{ marginBottom: '1rem' }}>
         {children}
       </main>
 
