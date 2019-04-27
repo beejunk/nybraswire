@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { Container } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import Header from './layout/Header';
 
 const Layout = ({ title, children }) => (
@@ -10,15 +10,20 @@ const Layout = ({ title, children }) => (
 
     <Header />
 
-    <main>
-      <Container>
+    <Container>
+      <main>
         {children}
-      </Container>
-    </main>
+      </main>
 
-    <footer>
-      <p>Copyright</p>
-    </footer>
+      <footer>
+        <Row className="border-top">
+          <Col>
+            <small className="text-muted">Copyright 2019 Brian David</small>
+          </Col>
+        </Row>
+      </footer>
+    </Container>
+
   </div>
 );
 
