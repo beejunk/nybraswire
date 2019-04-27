@@ -11,6 +11,7 @@ import {
 } from 'reactstrap';
 import Link from 'next/link';
 import Router from 'next/router';
+import ReactMarkdown from 'react-markdown';
 import withAuth from '../shared/withAuth';
 import firebase from '../../firebase';
 
@@ -45,12 +46,13 @@ const PostEditor = ({
   id = '',
 }) => {
   const [state, setState] = useState({
-    title,
+    alertColor: 'success',
+    alertMessage: '',
     body,
     isSubmitting: false,
     showAlert: false,
-    alertMessage: '',
-    alertColor: 'success',
+    preview: false,
+    title,
   });
 
   return (
@@ -64,47 +66,87 @@ const PostEditor = ({
       </Alert>
 
       {user ? (
-        <Form>
-          <Row>
-            <Col sm={6}>
-              <FormGroup>
-                <Label for="postTitle">Title</Label>
-                <Input
-                  id="postTitle"
-                  name="title"
-                  value={state.title}
-                  onChange={({ target: { value } }) => {
-                    setState({ ...state, title: value });
-                  }}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
+        <>
+          {state.preview && (
+            <>
+              <Row className="border-bottom mb-3 align-items-center">
+                <Col>
+                  <h1>{title}</h1>
+                </Col>
+              </Row>
 
-          <Row>
-            <Col>
-              <FormGroup>
-                <Label for="postBody">Body</Label>
-                <Input
-                  id="postBody"
-                  type="textarea"
-                  name="body"
-                  value={state.body}
-                  onChange={({ target: { value } }) => {
-                    setState({ ...state, body: value });
-                  }}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
+              <Row className="border-bottom mb-3 align-items-center">
+                <Col>
+                  <ReactMarkdown source={state.body} />
+                </Col>
+              </Row>
+            </>
+          )}
 
-          <Button
-            onClick={() => { submitUpdatedPost(id, state, setState); }}
-            disabled={!contentHasChanged(state, { title, body })}
-          >
-            Submit
-          </Button>
-        </Form>
+          <Form>
+            {!state.preview && (
+              <>
+                <Row>
+                  <Col sm={6}>
+                    <FormGroup>
+                      <Label for="postTitle">Title</Label>
+                      <Input
+                        id="postTitle"
+                        name="title"
+                        value={state.title}
+                        onChange={({ target: { value } }) => {
+                          setState({ ...state, title: value });
+                        }}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+
+                <Row>
+                  <Col>
+                    <FormGroup>
+                      <Label for="postBody">Body</Label>
+                      <Input
+                        css={{
+                          minHeight: '15rem',
+                        }}
+                        id="postBody"
+                        type="textarea"
+                        name="body"
+                        value={state.body}
+                        onChange={({ target: { value } }) => {
+                          setState({ ...state, body: value });
+                        }}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+              </>
+            )}
+
+            <Row>
+              <Col xs={6} sm={3}>
+                <Button
+                  block
+                  onClick={() => { submitUpdatedPost(id, state, setState); }}
+                  disabled={!contentHasChanged(state, { title, body })}
+                >
+                  Submit
+                </Button>
+              </Col>
+
+              <Col xs={6} sm={3}>
+                <Button
+                  block
+                  color="info"
+                  onClick={() => { setState({ ...state, preview: !state.preview }); }}
+                >
+                  { state.preview ? 'Edit' : 'Preview' }
+                </Button>
+              </Col>
+            </Row>
+          </Form>
+        </>
       ) : (
         <p>
           Please
