@@ -42,7 +42,7 @@ const PostEditForm = ({
   actionCreators,
   disableSubmit = true,
 }) => (
-  <Form>
+  <Form className="mb-3">
     <Row>
       <Col sm={6}>
         <FormGroup>
