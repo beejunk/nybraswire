@@ -96,7 +96,7 @@ const PostEdit = ({
     <div className="PostEdit">
       <Alert
         isOpen={state.showAlert}
-        toggle={() => { dispatch(actionCreators.showAlert(true)); }}
+        toggle={() => { dispatch(actionCreators.showAlert(false)); }}
         color={state.alertColor}
       >
         {state.alertMessage}
