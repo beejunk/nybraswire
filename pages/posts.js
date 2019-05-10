@@ -1,44 +1,73 @@
-import { useReducer } from 'react';
+import Router from 'next/router';
+import { useReducer, useEffect } from 'react';
 import { Alert } from 'reactstrap';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
-import PostArticle from '../components/posts/PostArticle';
 import PostEdit from '../components/posts/PostEdit';
+import PostArticle from '../components/posts/PostArticle';
+import PostEditForm from '../components/posts/PostEditForm';
 
 const UPDATE_ALERT = 'UPDATE_ALERT';
 const UPDATE_TITLE = 'UPDATE_TITLE';
 const UPDATE_BODY = 'UPDATE_BODY';
 const SHOW_ALERT = 'SHOW_ALERT';
 const TOGGLE_PREVIEW = 'TOGGLE_PREVIEW';
+const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
 
-const actionCreators = {
+const generateActions = dispatch => ({
   showAlert(alertShouldShow) {
-    return {
+    dispatch({
       type: SHOW_ALERT,
       showAlert: alertShouldShow,
-    };
+    });
   },
 
   updateAlert({ color, message }) {
-    return {
+    dispatch({
       type: UPDATE_ALERT,
       alertMessage: message,
       alertColor: color,
-    };
+    });
   },
 
   togglePreview() {
-    return { type: TOGGLE_PREVIEW };
+    dispatch({ type: TOGGLE_PREVIEW });
   },
 
   updateBody(body) {
-    return { type: UPDATE_BODY, body };
+    dispatch({ type: UPDATE_BODY, body });
   },
 
   updateTitle(title) {
-    return { type: UPDATE_TITLE, title };
+    dispatch({ type: UPDATE_TITLE, title });
   },
-};
+
+  setShouldClearForm(shouldClearForm) {
+    dispatch({ type: SET_SHOULD_CLEAR_FORM, shouldClearForm });
+  },
+
+  submitPost(docId, title, body) {
+    const firestore = firebase.firestore();
+    const data = { title, body };
+    const ref = docId
+      ? firestore.collection('posts').doc(docId)
+      : firestore.collection('posts');
+    const request = docId ? ref.update(data) : ref.add(data);
+
+    request
+      .then((docRef) => {
+        Router.push(`/posts/${docId || docRef.id}`);
+      })
+      .catch((err) => {
+        this.updateAlert({
+          color: 'danger',
+          message: err.message,
+        });
+
+        this.showAlert(true);
+      });
+  },
+});
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -56,15 +85,15 @@ const reducer = (state, action) => {
       return { ...state, showAlert: action.showAlert };
     case TOGGLE_PREVIEW:
       return { ...state, preview: !state.preview };
+    case SET_SHOULD_CLEAR_FORM:
+      return { ...state, shouldClearForm: action.shouldClearForm };
     default:
       return state;
   }
 };
 
 const contentHasChanged = (state, title, body) => (
-  state.title !== title
-) || (
-  state.body !== body
+  state.title !== title || state.body !== body
 );
 
 const Posts = ({
@@ -72,39 +101,64 @@ const Posts = ({
   body = '',
   edit = false,
   id = '',
+  create = false,
 }) => {
   const initialState = {
     alertColor: 'success',
     alertMessage: '',
-    body,
     isSubmitting: false,
+    shouldClearForm: true,
     showAlert: false,
     preview: false,
     title,
+    body,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
+  const actions = generateActions(dispatch);
+
+  useEffect(() => {
+    if (create && state.shouldClearForm) {
+      // If already viewing a post when navigating to the create page, then the
+      // title and body need to be cleared or else the form will get populated
+      // with the post data.
+      actions.updateTitle('');
+      actions.updateBody('');
+      actions.setShouldClearForm(false);
+    } else if (!create && !state.shouldClearForm) {
+      // When navigating away from the create page to any other 'posts' page,
+      // mark the form as needing to be cleared.
+      actions.setShouldClearForm(true);
+    }
+  });
 
   return (
     <Layout title={title}>
       <Alert
         isOpen={state.showAlert}
-        toggle={() => { dispatch(actionCreators.showAlert(false)); }}
+        toggle={() => { actions.showAlert(false); }}
         color={state.alertColor}
       >
         {state.alertMessage}
       </Alert>
 
-      {edit ? (
+      {edit || create ? (
         <PostEdit
           title={state.title}
           body={state.body}
-          id={id}
-          dispatch={dispatch}
-          actionCreators={actionCreators}
+          togglePreview={actions.togglePreview}
           preview={state.preview}
-          disableSubmit={contentHasChanged(state, title, body)}
-        />
+        >
+          <PostEditForm
+            docId={id}
+            body={state.body}
+            title={state.title}
+            submitPost={() => { actions.submitPost(id, state.title, state.body); }}
+            disableSubmit={!contentHasChanged(state, title, body)}
+            updateBody={actions.updateBody}
+            updateTitle={actions.updateTitle}
+          />
+        </PostEdit>
       ) : (
         <PostArticle
           id={id}
@@ -117,10 +171,20 @@ const Posts = ({
 };
 
 Posts.getInitialProps = async (context) => {
-  const { id, edit } = context.query;
-  const post = await firebase.firestore().collection('posts').doc(id).get();
+  const { id, edit, create } = context.query;
+  let data = {};
 
-  return { ...post.data(), edit, id };
+  if (id) {
+    const post = await firebase.firestore().collection('posts').doc(id).get();
+    data = post.data();
+  }
+
+  return {
+    ...data,
+    create,
+    edit,
+    id,
+  };
 };
 
 export default Posts;

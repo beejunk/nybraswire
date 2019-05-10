@@ -2,17 +2,14 @@ import { Col, Button, Row } from 'reactstrap';
 import Link from 'next/link';
 import withAuth from '../shared/withAuth';
 import PostArticle from './PostArticle';
-import PostEditForm from './postEdit/PostEditForm';
 
 const PostEdit = ({
   title = '',
   body = '',
   user,
-  id = '',
   preview = false,
-  dispatch,
-  actionCreators,
-  disableSubmit,
+  togglePreview,
+  children,
 }) => (
   <div className="PostEdit">
     {user ? (
@@ -24,14 +21,7 @@ const PostEdit = ({
             editLink={false}
           />
         ) : (
-          <PostEditForm
-            body={body}
-            dispatch={dispatch}
-            actionCreators={actionCreators}
-            docId={id}
-            title={title}
-            disableSubmit={disableSubmit}
-          />
+          children
         )}
 
         <Row>
@@ -39,7 +29,7 @@ const PostEdit = ({
             <Button
               block
               color="info"
-              onClick={() => { dispatch(actionCreators.togglePreview()); }}
+              onClick={togglePreview}
             >
               { preview ? 'Edit' : 'Preview' }
             </Button>

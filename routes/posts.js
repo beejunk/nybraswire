@@ -5,6 +5,11 @@ const PAGE = '/posts';
 module.exports = (app) => {
   const posts = Router();
 
+  posts.get('/create', (req, res) => {
+    const queryParams = { create: true };
+    app.render(req, res, PAGE, queryParams);
+  });
+
   posts.get('/:id', (req, res) => {
     const queryParams = { id: req.params.id };
     app.render(req, res, PAGE, queryParams);

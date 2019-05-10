@@ -8,4 +8,13 @@ $danger:        rgba(202, 102, 128, 1);
 // Typography
 $font-family-sans-serif: Frutiger, "Frutiger Linotype", Univers, Calibri, "Gill Sans", "Gill Sans MT", "Myriad Pro", Myriad, "DejaVu Sans Condensed", "Liberation Sans", "Nimbus Sans L", Tahoma, Geneva, "Helvetica Neue", Helvetica, Arial, sans-serif;
 
+// Nav
+.nav-link {
+  color: $info;
+
+  &:hover {
+    color: darken($info, 15%);
+  }
+}
+
 @import '~bootstrap/scss/bootstrap';

@@ -5,6 +5,7 @@ import {
   NavbarBrand,
   Nav,
   NavItem,
+  NavLink,
 } from 'reactstrap';
 import withAuth from '../../../withAuth';
 import firebase from '../../../../../firebase';
@@ -26,7 +27,7 @@ const Navigation = ({ user }) => (
             Nybraswire ::
             {' '}
             <small className="text-info">
-                notes in code
+              notes in code
             </small>
           </a>
         </Link>
@@ -35,6 +36,18 @@ const Navigation = ({ user }) => (
 
     {user && (
       <Nav>
+        <NavItem className="mr-3">
+          <NavLink
+            tag={props => (
+              <Link as="/posts/create" href="/posts?create=true">
+                <a {...props}>
+                  Create Post
+                </a>
+              </Link>
+            )}
+          />
+        </NavItem>
+
         <NavItem>
           <Button onClick={logout} color="info">
             Log out

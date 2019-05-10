@@ -1,4 +1,3 @@
-import Router from 'next/router';
 import {
   Button,
   Col,
@@ -8,39 +7,15 @@ import {
   Label,
   Row,
 } from 'reactstrap';
-import firebase from '../../../firebase';
-
-const submitUpdatedPost = (
-  docId,
-  title,
-  body,
-  dispatch,
-  actionCreators,
-) => {
-  const postRef = firebase.firestore().collection('posts').doc(docId);
-
-  postRef.update({ title, body })
-    .then(() => {
-      Router.push(`/posts/${docId}`);
-    })
-    .catch((err) => {
-      dispatch(actionCreators.updateAlert({
-        alertColor: 'danger',
-        alertMessage: err.message,
-      }));
-
-      dispatch(actionCreators.showAlert(true));
-    });
-};
-
 
 const PostEditForm = ({
   title,
   body,
   docId,
-  dispatch,
-  actionCreators,
-  disableSubmit = true,
+  disableSubmit = false,
+  updateTitle,
+  updateBody,
+  submitPost,
 }) => (
   <Form className="mb-3">
     <Row>
@@ -52,7 +27,7 @@ const PostEditForm = ({
             name="title"
             value={title}
             onChange={({ target: { value } }) => {
-              dispatch(actionCreators.updateTitle(value));
+              updateTitle(value);
             }}
           />
         </FormGroup>
@@ -72,7 +47,7 @@ const PostEditForm = ({
             name="body"
             value={body}
             onChange={({ target: { value } }) => {
-              dispatch(actionCreators.updateBody(value));
+              updateBody(value);
             }}
           />
         </FormGroup>
@@ -84,7 +59,7 @@ const PostEditForm = ({
         <Button
           block
           onClick={() => {
-            submitUpdatedPost(docId, title, body, dispatch, actionCreators);
+            submitPost(docId, title, body);
           }}
           disabled={disableSubmit}
         >
