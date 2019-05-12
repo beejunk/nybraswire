@@ -1,5 +1,7 @@
+// @flow
+
+import React, { useReducer, useEffect } from 'react';
 import Router from 'next/router';
-import { useReducer, useEffect } from 'react';
 import { Alert } from 'reactstrap';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
@@ -7,82 +9,123 @@ import PostEdit from '../components/posts/PostEdit';
 import PostArticle from '../components/posts/PostArticle';
 import PostEditForm from '../components/posts/PostEditForm';
 
-const UPDATE_ALERT = 'UPDATE_ALERT';
-const UPDATE_TITLE = 'UPDATE_TITLE';
-const UPDATE_BODY = 'UPDATE_BODY';
-const SHOW_ALERT = 'SHOW_ALERT';
-const TOGGLE_PREVIEW = 'TOGGLE_PREVIEW';
-const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
+import type { AlertState, PostType } from '../types/posts';
 
-const generateActions = dispatch => ({
-  showAlert(alertShouldShow) {
-    dispatch({
-      type: SHOW_ALERT,
-      showAlert: alertShouldShow,
-    });
+// ---------
+// Constants
+// ---------
+
+export const UPDATE_ALERT = 'UPDATE_ALERT';
+export const UPDATE_FORM = 'UPDATE_FORM';
+export const TOGGLE_PREVIEW = 'TOGGLE_PREVIEW';
+export const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
+
+// -------------------------
+// Action and dispatch types
+// -------------------------
+
+type UpdateAlertAction = { type: 'UPDATE_ALERT', alert: AlertState };
+type UpdateFormAction = { type: 'UPDATE_FORM', form: PostType };
+type TogglePreviewAction = { type: 'TOGGLE_PREVIEW' };
+type SetShouldClearFormAction = { type: 'SET_SHOULD_CLEAR_FORM', shouldClearForm: boolean };
+
+type Action =
+  | UpdateAlertAction
+  | UpdateFormAction
+  | TogglePreviewAction
+  | SetShouldClearFormAction;
+
+type Dispatch = (action: Action) => void;
+
+// --------------------------------
+// Component props and state types.
+// --------------------------------
+
+export type Props = {
+  +post: PostType,
+  +edit: boolean,
+  +id: string,
+  +create: boolean,
+};
+
+
+export type State = {
+  +alert: AlertState,
+  +form: PostType,
+  +shouldClearForm: boolean,
+  +preview: boolean,
+};
+
+
+// ---------------
+// Action creators
+// ---------------
+
+const updateAlert = (alert: AlertState): UpdateAlertAction => ({
+  type: UPDATE_ALERT,
+  alert,
+});
+
+const updateForm = (form: PostType): UpdateFormAction => ({
+  type: UPDATE_FORM,
+  form,
+});
+
+const togglePreview = (): TogglePreviewAction => ({
+  type: TOGGLE_PREVIEW,
+});
+
+const setShouldClearForm = (shouldClearForm: boolean): SetShouldClearFormAction => ({
+  type: SET_SHOULD_CLEAR_FORM,
+  shouldClearForm,
+});
+
+/**
+ * Generate actions using the given dispatch function.
+ */
+const generateActions = (dispatch: Dispatch) => ({
+  updateAlert(alert: AlertState) {
+    dispatch(updateAlert(alert));
   },
 
-  updateAlert({ color, message }) {
-    dispatch({
-      type: UPDATE_ALERT,
-      alertMessage: message,
-      alertColor: color,
-    });
+  updateForm(form: PostType) {
+    dispatch(updateForm(form));
   },
 
   togglePreview() {
-    dispatch({ type: TOGGLE_PREVIEW });
+    dispatch(togglePreview());
   },
 
-  updateBody(body) {
-    dispatch({ type: UPDATE_BODY, body });
+  setShouldClearForm(shouldClearForm: boolean) {
+    dispatch(setShouldClearForm(shouldClearForm));
   },
 
-  updateTitle(title) {
-    dispatch({ type: UPDATE_TITLE, title });
-  },
-
-  setShouldClearForm(shouldClearForm) {
-    dispatch({ type: SET_SHOULD_CLEAR_FORM, shouldClearForm });
-  },
-
-  submitPost(docId, title, body) {
+  submitPost(docId: string, post: PostType) {
     const firestore = firebase.firestore();
-    const data = { title, body };
     const ref = docId
       ? firestore.collection('posts').doc(docId)
       : firestore.collection('posts');
-    const request = docId ? ref.update(data) : ref.add(data);
+    const request = docId ? ref.update(post) : ref.add(post);
 
     request
       .then((docRef) => {
         Router.push(`/posts/${docId || docRef.id}`);
       })
-      .catch((err) => {
-        this.updateAlert({
-          color: 'danger',
-          message: err.message,
-        });
-
-        this.showAlert(true);
+      .catch(({ message }) => {
+        this.updateAlert({ color: 'danger', message, show: true });
       });
   },
 });
 
-const reducer = (state, action) => {
+/**
+ * State reducer.
+ */
+const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case UPDATE_TITLE:
-      return { ...state, title: action.title };
-    case UPDATE_BODY:
-      return { ...state, body: action.body };
     case UPDATE_ALERT:
-      return {
-        ...state,
-        alertMessage: action.alertMessage,
-        alertColor: action.alertColor,
-      };
-    case SHOW_ALERT:
-      return { ...state, showAlert: action.showAlert };
+      return { ...state, alert: { ...action.alert } };
+    case UPDATE_FORM:
+      return { ...state, form: { ...action.form } };
     case TOGGLE_PREVIEW:
       return { ...state, preview: !state.preview };
     case SET_SHOULD_CLEAR_FORM:
@@ -92,26 +135,30 @@ const reducer = (state, action) => {
   }
 };
 
-const contentHasChanged = (state, title, body) => (
-  state.title !== title || state.body !== body
+/**
+ * Given the form state and the original document data, will return `true` if the
+ * content has changed, `false` otherwise.
+ */
+const contentHasChanged = (form: PostType, post: PostType) => (
+  form.title !== post.title || form.body !== post.body
 );
 
-const Posts = ({
-  title = '',
-  body = '',
-  edit = false,
-  id = '',
-  create = false,
-}) => {
-  const initialState = {
-    alertColor: 'success',
-    alertMessage: '',
-    isSubmitting: false,
+/**
+ * Container component that manages the all operations related to posts.
+ */
+const Posts = (props: Props) => {
+  const {
+    post,
+    edit,
+    id,
+    create,
+  } = props;
+
+  const initialState: State = {
+    alert: { color: 'success', message: '', show: false },
+    form: { ...post },
     shouldClearForm: true,
-    showAlert: false,
     preview: false,
-    title,
-    body,
   };
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -122,8 +169,7 @@ const Posts = ({
       // If already viewing a post when navigating to the create page, then the
       // title and body need to be cleared or else the form will get populated
       // with the post data.
-      actions.updateTitle('');
-      actions.updateBody('');
+      actions.updateForm({ title: '', body: '' });
       actions.setShouldClearForm(false);
     } else if (!create && !state.shouldClearForm) {
       // When navigating away from the create page to any other 'posts' page,
@@ -133,37 +179,33 @@ const Posts = ({
   });
 
   return (
-    <Layout title={title}>
+    <Layout title={post.title}>
       <Alert
-        isOpen={state.showAlert}
-        toggle={() => { actions.showAlert(false); }}
-        color={state.alertColor}
+        isOpen={state.alert.show}
+        toggle={() => { actions.updateAlert({ ...state.alert, show: false }); }}
+        color={state.alert.color}
       >
-        {state.alertMessage}
+        {state.alert.message}
       </Alert>
 
       {edit || create ? (
         <PostEdit
-          title={state.title}
-          body={state.body}
+          form={state.form}
           togglePreview={actions.togglePreview}
           preview={state.preview}
         >
           <PostEditForm
             docId={id}
-            body={state.body}
-            title={state.title}
-            submitPost={() => { actions.submitPost(id, state.title, state.body); }}
-            disableSubmit={!contentHasChanged(state, title, body)}
-            updateBody={actions.updateBody}
-            updateTitle={actions.updateTitle}
+            form={state.form}
+            submitPost={() => { actions.submitPost(id, state.form); }}
+            disableSubmit={!contentHasChanged(state.form, post)}
+            updateForm={actions.updateForm}
           />
         </PostEdit>
       ) : (
         <PostArticle
           id={id}
-          title={title}
-          body={body}
+          post={post}
         />
       )}
     </Layout>
@@ -172,15 +214,15 @@ const Posts = ({
 
 Posts.getInitialProps = async (context) => {
   const { id, edit, create } = context.query;
-  let data = {};
+  let post = {};
 
   if (id) {
-    const post = await firebase.firestore().collection('posts').doc(id).get();
-    data = post.data();
+    const postRequest = await firebase.firestore().collection('posts').doc(id).get();
+    post = postRequest.data();
   }
 
   return {
-    ...data,
+    post,
     create,
     edit,
     id,

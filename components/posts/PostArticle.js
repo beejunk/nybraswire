@@ -1,19 +1,34 @@
-import { useEffect } from 'react';
+// @flow
+
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import hljs from 'highlight.js/lib/highlight';
 import { Col, Row } from 'reactstrap';
 import ReactMarkdown from 'react-markdown';
 import withAuth from '../shared/withAuth';
 
+import type { PostType } from '../../types/posts';
+
 const ROUTE = '/posts';
 
-const PostArticle = ({
-  title = '',
-  body = '',
-  id = '',
-  user,
-  editLink = true,
-}) => {
+type Props = {
+  post: PostType,
+  id: string,
+  user: any,
+  editLink: boolean,
+};
+
+/**
+ * Renders a post.
+ */
+const PostArticle = (props: Props) => {
+  const {
+    post,
+    id,
+    user,
+    editLink = true,
+  } = props;
+
   useEffect(() => {
     hljs.initHighlighting();
 
@@ -32,7 +47,7 @@ const PostArticle = ({
     <article className="PostArticle">
       <Row className="border-bottom mb-3 align-items-center">
         <Col>
-          <h1>{title}</h1>
+          <h1>{post.title}</h1>
         </Col>
 
         {user && editLink && (
@@ -48,7 +63,7 @@ const PostArticle = ({
 
       <Row>
         <Col>
-          <ReactMarkdown source={body} />
+          <ReactMarkdown source={post.body} />
         </Col>
       </Row>
     </article>

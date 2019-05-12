@@ -1,23 +1,34 @@
+// @flow
+
+import React from 'react';
 import { Col, Button, Row } from 'reactstrap';
 import Link from 'next/link';
 import withAuth from '../shared/withAuth';
 import PostArticle from './PostArticle';
 
+import type { PostType } from '../../types/posts';
+
+type Props = {
+  form: PostType,
+  user: any,
+  preview: boolean,
+  togglePreview: (boolean) => void,
+  children: any,
+};
+
 const PostEdit = ({
-  title = '',
-  body = '',
+  form,
   user,
-  preview = false,
+  preview,
   togglePreview,
   children,
-}) => (
+}: Props) => (
   <div className="PostEdit">
     {user ? (
       <>
         {preview ? (
           <PostArticle
-            title={title}
-            body={body}
+            post={form}
             editLink={false}
           />
         ) : (

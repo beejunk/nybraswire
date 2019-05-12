@@ -1,3 +1,6 @@
+// @flow
+
+import React from 'react';
 import {
   Button,
   Col,
@@ -8,15 +11,23 @@ import {
   Row,
 } from 'reactstrap';
 
+import type { PostType } from '../../types/posts';
+
+type Props = {
+  form: PostType,
+  docId: string,
+  disableSubmit: boolean,
+  updateForm: (form: PostType) => void,
+  submitPost: (docId: string, post: PostType) => void,
+};
+
 const PostEditForm = ({
-  title,
-  body,
   docId,
-  disableSubmit = false,
-  updateTitle,
-  updateBody,
+  disableSubmit,
+  form,
+  updateForm,
   submitPost,
-}) => (
+}: Props) => (
   <Form className="mb-3">
     <Row>
       <Col sm={6}>
@@ -25,9 +36,9 @@ const PostEditForm = ({
           <Input
             id="postTitle"
             name="title"
-            value={title}
+            value={form.title}
             onChange={({ target: { value } }) => {
-              updateTitle(value);
+              updateForm({ ...form, title: value });
             }}
           />
         </FormGroup>
@@ -45,9 +56,9 @@ const PostEditForm = ({
             id="postBody"
             type="textarea"
             name="body"
-            value={body}
+            value={form.body}
             onChange={({ target: { value } }) => {
-              updateBody(value);
+              updateForm({ ...form, body: value });
             }}
           />
         </FormGroup>
@@ -59,7 +70,7 @@ const PostEditForm = ({
         <Button
           block
           onClick={() => {
-            submitPost(docId, title, body);
+            submitPost(docId, form);
           }}
           disabled={disableSubmit}
         >

@@ -1,10 +1,14 @@
 module.exports = {
+  parser: 'babel-eslint',
   env: {
     browser: true,
     es6: true,
     node: true,
   },
-  extends: 'airbnb',
+  extends: [
+    'airbnb',
+    'plugin:flowtype/recommended',
+  ],
   globals: {
     Atomics: 'readonly',
     SharedArrayBuffer: 'readonly',
@@ -18,7 +22,8 @@ module.exports = {
   },
   plugins: [
     'react',
-    'react-hooks'
+    'react-hooks',
+    'flowtype',
   ],
   rules: {
     'react/jsx-filename-extension': 0,
