@@ -44,7 +44,6 @@ type Dispatch = (action: Action) => void;
 export type Props = {
   post: ?PostType,
   +edit: boolean,
-  +id: string,
   +create: boolean,
 };
 
@@ -100,16 +99,19 @@ const generateActions = (dispatch: Dispatch) => ({
     dispatch(setShouldClearForm(shouldClearForm));
   },
 
-  async submitPost(docId: string, post: PostType) {
+  async submitPost(form: FormState, post: ?PostType) {
     const firestore = firebase.firestore();
-    const ref = docId
-      ? firestore.collection('posts').doc(docId)
+    const ref = post
+      ? firestore.collection('posts').doc(post.id)
       : firestore.collection('posts');
-    const request = docId ? ref.update(post) : ref.add(post);
+    const request = post
+      ? ref.update({ ...post, ...form })
+      // TODO: Add timestamps to new documents
+      : ref.add(form);
 
     try {
       const docRef = await request;
-      Router.push(`/posts/${docId || docRef.id}`);
+      Router.push(`/posts/${post ? post.id : docRef.id}`);
     } catch (err) {
       const message = `There was a problem submitting your post: ${err.message}`;
       this.updateAlert({ color: 'danger', message, show: true });
@@ -149,13 +151,12 @@ const validateContent = (form: FormState, post: ?PostType) => {
 };
 
 /**
- * Container component that manages the all operations related to posts.
+ * Container component that manages all operations related to posts.
  */
 const Posts = (props: Props) => {
   const {
     post,
     edit,
-    id,
     create,
   } = props;
 
@@ -185,6 +186,8 @@ const Posts = (props: Props) => {
     }
   });
 
+  // TODO: Create 'Post does not exist page'.
+
   return (
     <Layout title={post && !edit ? post.title : 'Create/Edit Post'}>
       <Alert
@@ -202,18 +205,20 @@ const Posts = (props: Props) => {
           preview={state.preview}
         >
           <PostEditForm
-            docId={id}
             form={state.form}
-            submitPost={() => { actions.submitPost(id, { ...post, ...state.form }); }}
+            submitPost={() => { actions.submitPost(state.form, post); }}
             disableSubmit={!validateContent(state.form, post)}
             updateForm={actions.updateForm}
           />
         </PostEdit>
       ) : (
-        <PostArticle
-          id={id}
-          post={post}
-        />
+        <>
+          {post ? (
+            <PostArticle id={post.id} post={post} />
+          ) : (
+            <p>Post does not exist</p>
+          )}
+        </>
       )}
     </Layout>
   );
@@ -225,7 +230,10 @@ Posts.getInitialProps = async (context) => {
 
   if (id) {
     const postRequest = await firebase.firestore().collection('posts').doc(id).get();
-    post = { id, ...postRequest.data() };
+
+    if (postRequest.exists) {
+      post = { id, ...postRequest.data() };
+    }
   }
 
   return {
