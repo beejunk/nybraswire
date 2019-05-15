@@ -100,20 +100,20 @@ const generateActions = (dispatch: Dispatch) => ({
     dispatch(setShouldClearForm(shouldClearForm));
   },
 
-  submitPost(docId: string, post: PostType) {
+  async submitPost(docId: string, post: PostType) {
     const firestore = firebase.firestore();
     const ref = docId
       ? firestore.collection('posts').doc(docId)
       : firestore.collection('posts');
     const request = docId ? ref.update(post) : ref.add(post);
 
-    request
-      .then((docRef) => {
-        Router.push(`/posts/${docId || docRef.id}`);
-      })
-      .catch(({ message }) => {
-        this.updateAlert({ color: 'danger', message, show: true });
-      });
+    try {
+      const docRef = await request;
+      Router.push(`/posts/${docId || docRef.id}`);
+    } catch (err) {
+      const message = `There was a problem submitting your post: ${err.message}`;
+      this.updateAlert({ color: 'danger', message, show: true });
+    }
   },
 });
 
