@@ -11,26 +11,33 @@ import {
   Row,
 } from 'reactstrap';
 
-import type { PostType } from '../../types/posts';
+import type { FormState } from '../../types/posts';
+
+// TODO: Probably want to move this into a utils folder of some kind.
+const formatDate = (timestamp: number) => {
+  const date = new Date(timestamp);
+  const offset = date.getTimezoneOffset() * 60 * 1000;
+  const offsetDate = new Date(timestamp - offset);
+
+  return offsetDate.toISOString().split('.')[0];
+};
 
 type Props = {
-  form: PostType,
-  docId: string,
+  form: FormState,
   disableSubmit: boolean,
-  updateForm: (form: PostType) => void,
-  submitPost: (docId: string, post: PostType) => void,
+  updateForm: (form: FormState) => void,
+  submitPost: () => void,
 };
 
 const PostEditForm = ({
-  docId,
   disableSubmit,
   form,
   updateForm,
   submitPost,
 }: Props) => (
   <Form className="mb-3">
-    <Row>
-      <Col sm={6}>
+    <Row form>
+      <Col sm={12} md={8}>
         <FormGroup>
           <Label for="postTitle">Title</Label>
           <Input
@@ -43,9 +50,21 @@ const PostEditForm = ({
           />
         </FormGroup>
       </Col>
+
+      <Col sm={6} md={4}>
+        <FormGroup>
+          <Label for="postedOnDate">Posted On</Label>
+          <Input
+            type="datetime-local"
+            name="postedOnDate"
+            id="postedOnDate"
+            value={formatDate(form.postedOn)}
+          />
+        </FormGroup>
+      </Col>
     </Row>
 
-    <Row>
+    <Row form>
       <Col>
         <FormGroup>
           <Label for="postBody">Body</Label>
@@ -65,17 +84,10 @@ const PostEditForm = ({
       </Col>
     </Row>
 
-    <Row>
+    <Row form>
       <Col xs={6} sm={3}>
-        <Button
-          block
-          onClick={() => {
-            submitPost(docId, form);
-          }}
-          disabled={disableSubmit}
-        >
+        <Button block onClick={submitPost} disabled={disableSubmit}>
           Submit
-
         </Button>
       </Col>
     </Row>

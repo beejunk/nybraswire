@@ -9,7 +9,7 @@ import PostEdit from '../components/posts/PostEdit';
 import PostArticle from '../components/posts/PostArticle';
 import PostEditForm from '../components/posts/PostEditForm';
 
-import type { AlertState, PostType } from '../types/posts';
+import type { AlertState, FormState, PostType } from '../types/posts';
 
 // ---------
 // Constants
@@ -25,7 +25,7 @@ export const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
 // -------------------------
 
 type UpdateAlertAction = { type: 'UPDATE_ALERT', alert: AlertState };
-type UpdateFormAction = { type: 'UPDATE_FORM', form: PostType };
+type UpdateFormAction = { type: 'UPDATE_FORM', form: FormState };
 type TogglePreviewAction = { type: 'TOGGLE_PREVIEW' };
 type SetShouldClearFormAction = { type: 'SET_SHOULD_CLEAR_FORM', shouldClearForm: boolean };
 
@@ -42,7 +42,7 @@ type Dispatch = (action: Action) => void;
 // --------------------------------
 
 export type Props = {
-  +post: PostType,
+  post: ?PostType,
   +edit: boolean,
   +id: string,
   +create: boolean,
@@ -51,7 +51,7 @@ export type Props = {
 
 export type State = {
   +alert: AlertState,
-  +form: PostType,
+  +form: FormState,
   +shouldClearForm: boolean,
   +preview: boolean,
 };
@@ -66,7 +66,7 @@ const updateAlert = (alert: AlertState): UpdateAlertAction => ({
   alert,
 });
 
-const updateForm = (form: PostType): UpdateFormAction => ({
+const updateForm = (form: FormState): UpdateFormAction => ({
   type: UPDATE_FORM,
   form,
 });
@@ -88,7 +88,7 @@ const generateActions = (dispatch: Dispatch) => ({
     dispatch(updateAlert(alert));
   },
 
-  updateForm(form: PostType) {
+  updateForm(form: FormState) {
     dispatch(updateForm(form));
   },
 
@@ -136,12 +136,17 @@ const reducer = (state: State, action: Action): State => {
 };
 
 /**
- * Given the form state and the original document data, will return `true` if the
- * content has changed, `false` otherwise.
+ * Given the form state and the original document data, will return `true` if
+ * the content has changed and is not empty, `false` otherwise.
  */
-const contentHasChanged = (form: PostType, post: PostType) => (
-  form.title !== post.title || form.body !== post.body
-);
+const validateContent = (form: FormState, post: ?PostType) => {
+  const contentHasChanged = post
+    ? (form.title !== post.title) || (form.body !== post.body)
+    : true;
+  const contentIsNotEmpty = (form.title !== '') && (form.body !== '');
+
+  return contentHasChanged && contentIsNotEmpty;
+};
 
 /**
  * Container component that manages the all operations related to posts.
@@ -156,7 +161,9 @@ const Posts = (props: Props) => {
 
   const initialState: State = {
     alert: { color: 'success', message: '', show: false },
-    form: { ...post },
+    form: post
+      ? { title: post.title, body: post.body, postedOn: post.postedOn }
+      : { title: '', body: '', postedOn: Date.now() },
     shouldClearForm: true,
     preview: false,
   };
@@ -169,7 +176,7 @@ const Posts = (props: Props) => {
       // If already viewing a post when navigating to the create page, then the
       // title and body need to be cleared or else the form will get populated
       // with the post data.
-      actions.updateForm({ title: '', body: '' });
+      actions.updateForm({ title: '', body: '', postedOn: Date.now() });
       actions.setShouldClearForm(false);
     } else if (!create && !state.shouldClearForm) {
       // When navigating away from the create page to any other 'posts' page,
@@ -179,7 +186,7 @@ const Posts = (props: Props) => {
   });
 
   return (
-    <Layout title={post.title}>
+    <Layout title={post && !edit ? post.title : 'Create/Edit Post'}>
       <Alert
         isOpen={state.alert.show}
         toggle={() => { actions.updateAlert({ ...state.alert, show: false }); }}
@@ -197,8 +204,8 @@ const Posts = (props: Props) => {
           <PostEditForm
             docId={id}
             form={state.form}
-            submitPost={() => { actions.submitPost(id, state.form); }}
-            disableSubmit={!contentHasChanged(state.form, post)}
+            submitPost={() => { actions.submitPost(id, { ...post, ...state.form }); }}
+            disableSubmit={!validateContent(state.form, post)}
             updateForm={actions.updateForm}
           />
         </PostEdit>
@@ -214,18 +221,17 @@ const Posts = (props: Props) => {
 
 Posts.getInitialProps = async (context) => {
   const { id, edit, create } = context.query;
-  let post = {};
+  let post;
 
   if (id) {
     const postRequest = await firebase.firestore().collection('posts').doc(id).get();
-    post = postRequest.data();
+    post = { id, ...postRequest.data() };
   }
 
   return {
     post,
     create,
     edit,
-    id,
   };
 };
 

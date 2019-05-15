@@ -6,7 +6,17 @@ export type AlertState = {
   +show: boolean,
 };
 
-export type PostType = {
+export type FormState = {
   +title: string,
   +body: string,
+  +postedOn: number,
 };
+
+export type PostType =
+  & FormState
+  & {
+    +id: string,
+    +createdOn: number,
+    +updatedOn: number,
+    +active: boolean,
+  };
