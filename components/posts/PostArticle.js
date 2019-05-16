@@ -5,7 +5,7 @@ import Link from 'next/link';
 import hljs from 'highlight.js/lib/highlight';
 import { Col, Row } from 'reactstrap';
 import ReactMarkdown from 'react-markdown';
-import withAuth from '../shared/withAuth';
+import useAuth from '../../hooks/useAuth';
 
 import type { PostType } from '../../types/posts';
 
@@ -13,8 +13,6 @@ const ROUTE = '/posts';
 
 type Props = {
   post: PostType,
-  id: string,
-  user: any,
   editLink: boolean,
 };
 
@@ -24,10 +22,10 @@ type Props = {
 const PostArticle = (props: Props) => {
   const {
     post,
-    id,
-    user,
     editLink = true,
   } = props;
+
+  const user = useAuth();
 
   useEffect(() => {
     hljs.initHighlighting();
@@ -52,7 +50,7 @@ const PostArticle = (props: Props) => {
 
         {user && editLink && (
           <Col xs={3} className="text-right">
-            <Link as={`${ROUTE}/${id}/edit`} href={`/${ROUTE}?id=${id}&edit=true`}>
+            <Link as={`${ROUTE}/${post.id}/edit`} href={`/${ROUTE}?id=${post.id}&edit=true`}>
               <a>
                 Edit
               </a>
@@ -70,4 +68,4 @@ const PostArticle = (props: Props) => {
   );
 };
 
-export default withAuth(PostArticle);
+export default PostArticle;

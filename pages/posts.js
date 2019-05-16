@@ -100,18 +100,30 @@ const generateActions = (dispatch: Dispatch) => ({
   },
 
   async submitPost(form: FormState, post: ?PostType) {
+    // TODO: Good lord this is ugly.
     const firestore = firebase.firestore();
-    const ref = post
-      ? firestore.collection('posts').doc(post.id)
-      : firestore.collection('posts');
-    const request = post
-      ? ref.update({ ...post, ...form })
-      // TODO: Add timestamps to new documents
-      : ref.add(form);
+    let ref;
+    let request;
+
+    if (post) {
+      ref = firestore.collection('posts').doc(post.id);
+      request = ref.update({ ...post, ...form });
+    } else {
+      ref = firestore.collection('posts');
+      request = ref.add(form);
+    }
 
     try {
       const docRef = await request;
-      Router.push(`/posts/${post ? post.id : docRef.id}`);
+      let docId;
+
+      if (docRef && 'id' in docRef) {
+        docId = docRef.id;
+      } else if (post) {
+        docId = post.id;
+      }
+
+      Router.push(`/posts/${docId || ''}`);
     } catch (err) {
       const message = `There was a problem submitting your post: ${err.message}`;
       this.updateAlert({ color: 'danger', message, show: true });
@@ -214,7 +226,7 @@ const Posts = (props: Props) => {
       ) : (
         <>
           {post ? (
-            <PostArticle id={post.id} post={post} />
+            <PostArticle post={post} editLink />
           ) : (
             <p>Post does not exist</p>
           )}
