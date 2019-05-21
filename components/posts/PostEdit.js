@@ -6,10 +6,10 @@ import Link from 'next/link';
 import PostArticle from './PostArticle';
 import useAuth from '../../hooks/useAuth';
 
-import type { PostType } from '../../types/posts';
+import type { FormState } from '../../types/posts';
 
 type Props = {
-  form: PostType,
+  form: FormState,
   preview: boolean,
   togglePreview: (boolean) => void,
   children: any,

@@ -7,21 +7,20 @@ import { Col, Row } from 'reactstrap';
 import ReactMarkdown from 'react-markdown';
 import useAuth from '../../hooks/useAuth';
 
-import type { PostType } from '../../types/posts';
+import type { FormState, PostType } from '../../types/posts';
 
 const ROUTE = '/posts';
 
 type Props = {
-  post: PostType,
+  post: PostType | FormState,
+  postId?: string,
   editLink: boolean,
 };
 
-/**
- * Renders a post.
- */
 const PostArticle = (props: Props) => {
   const {
     post,
+    postId,
     editLink = true,
   } = props;
 
@@ -34,8 +33,6 @@ const PostArticle = (props: Props) => {
     // called once. This is not the case with client-side routing in a Next.js
     // app, where content may be dynamically loaded on a single-page. So we
     // need to set the `called` flag to `false` during component clean-up.
-
-    // TODO: Move this into a more appropriate spot(?)
     return () => {
       hljs.initHighlighting.called = false;
     };
@@ -48,9 +45,9 @@ const PostArticle = (props: Props) => {
           <h1>{post.title}</h1>
         </Col>
 
-        {user && editLink && (
+        {user && editLink && postId && (
           <Col xs={3} className="text-right">
-            <Link as={`${ROUTE}/${post.id}/edit`} href={`/${ROUTE}?id=${post.id}&edit=true`}>
+            <Link as={`${ROUTE}/${postId}/edit`} href={`/${ROUTE}?id=${postId}&edit=true`}>
               <a>
                 Edit
               </a>
@@ -67,5 +64,7 @@ const PostArticle = (props: Props) => {
     </article>
   );
 };
+
+PostArticle.defaultProps = { postId: undefined };
 
 export default PostArticle;

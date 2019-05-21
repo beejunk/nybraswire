@@ -26,14 +26,14 @@ type Props = {
   form: FormState,
   disableSubmit: boolean,
   updateForm: (form: FormState) => void,
-  submitPost: () => void,
+  submit: () => void,
 };
 
 const PostEditForm = ({
   disableSubmit,
   form,
   updateForm,
-  submitPost,
+  submit,
 }: Props) => (
   <Form className="mb-3">
     <Row form>
@@ -86,7 +86,7 @@ const PostEditForm = ({
 
     <Row form>
       <Col xs={6} sm={3}>
-        <Button block onClick={submitPost} disabled={disableSubmit}>
+        <Button block onClick={submit} disabled={disableSubmit}>
           Submit
         </Button>
       </Col>

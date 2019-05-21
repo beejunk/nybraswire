@@ -15,7 +15,6 @@ export type FormState = {
 export type PostType =
   & FormState
   & {
-    +id: string,
     +createdOn: number,
     +updatedOn: number,
     +active: boolean,

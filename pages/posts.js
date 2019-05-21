@@ -42,11 +42,11 @@ type Dispatch = (action: Action) => void;
 // --------------------------------
 
 export type Props = {
-  post: ?PostType,
+  +post?: PostType,
+  +postId?: string,
   +edit: boolean,
   +create: boolean,
 };
-
 
 export type State = {
   +alert: AlertState,
@@ -79,9 +79,6 @@ const setShouldClearForm = (shouldClearForm: boolean): SetShouldClearFormAction 
   shouldClearForm,
 });
 
-/**
- * Generate actions using the given dispatch function.
- */
 const generateActions = (dispatch: Dispatch) => ({
   updateAlert(alert: AlertState) {
     dispatch(updateAlert(alert));
@@ -99,41 +96,43 @@ const generateActions = (dispatch: Dispatch) => ({
     dispatch(setShouldClearForm(shouldClearForm));
   },
 
-  async submitPost(form: FormState, post: ?PostType) {
-    // TODO: Good lord this is ugly.
+  async createPost(form: FormState) {
     const firestore = firebase.firestore();
-    let ref;
-    let request;
-
-    if (post) {
-      ref = firestore.collection('posts').doc(post.id);
-      request = ref.update({ ...post, ...form });
-    } else {
-      ref = firestore.collection('posts');
-      request = ref.add(form);
-    }
+    const ref = firestore.collection('posts');
+    const request = ref.add(form);
 
     try {
       const docRef = await request;
-      let docId;
-
-      if (docRef && 'id' in docRef) {
-        docId = docRef.id;
-      } else if (post) {
-        docId = post.id;
-      }
-
-      Router.push(`/posts/${docId || ''}`);
+      Router.push(`/posts/${docRef.id}`);
     } catch (err) {
-      const message = `There was a problem submitting your post: ${err.message}`;
+      const message = `There was a problem creating your post: ${err.message}`;
       this.updateAlert({ color: 'danger', message, show: true });
+    }
+  },
+
+  async updatePost(form: FormState, post: PostType, postId: string) {
+    const firestore = firebase.firestore();
+    const ref = firestore.collection('posts').doc(postId);
+    const request = await ref.update({ ...post, ...form });
+
+    try {
+      await request;
+      Router.push(`/posts/${postId}`);
+    } catch (err) {
+      const message = `There was a problem updating your post: ${err.message}`;
+      this.updateAlert({ color: 'danger', message, show: true });
+    }
+  },
+
+  submit(form: FormState, post?: PostType, postId?: string) {
+    if (post && postId) {
+      this.updatePost(form, post, postId);
+    } else {
+      this.createPost(form);
     }
   },
 });
 
-/**
- * State reducer.
- */
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
     case UPDATE_ALERT:
@@ -149,11 +148,11 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-/**
- * Given the form state and the original document data, will return `true` if
- * the content has changed and is not empty, `false` otherwise.
- */
-const validateContent = (form: FormState, post: ?PostType) => {
+// -----------------
+// Helper functions.
+// -----------------
+
+const validateContent = (form: FormState, post?: PostType) => {
   const contentHasChanged = post
     ? (form.title !== post.title) || (form.body !== post.body)
     : true;
@@ -162,12 +161,22 @@ const validateContent = (form: FormState, post: ?PostType) => {
   return contentHasChanged && contentIsNotEmpty;
 };
 
-/**
- * Container component that manages all operations related to posts.
- */
+const getFormStateFromPost = (post: PostType) => ({
+  title: post.title,
+  body: post.body,
+  postedOn: post.postedOn,
+});
+
+const getDefaultFormState = () => ({ title: '', body: '', postedOn: Date.now() });
+
+// ---------
+// Component
+// ---------
+
 const Posts = (props: Props) => {
   const {
     post,
+    postId,
     edit,
     create,
   } = props;
@@ -175,8 +184,8 @@ const Posts = (props: Props) => {
   const initialState: State = {
     alert: { color: 'success', message: '', show: false },
     form: post
-      ? { title: post.title, body: post.body, postedOn: post.postedOn }
-      : { title: '', body: '', postedOn: Date.now() },
+      ? getFormStateFromPost(post)
+      : getDefaultFormState(),
     shouldClearForm: true,
     preview: false,
   };
@@ -198,8 +207,6 @@ const Posts = (props: Props) => {
     }
   });
 
-  // TODO: Create 'Post does not exist page'.
-
   return (
     <Layout title={post && !edit ? post.title : 'Create/Edit Post'}>
       <Alert
@@ -218,23 +225,28 @@ const Posts = (props: Props) => {
         >
           <PostEditForm
             form={state.form}
-            submitPost={() => { actions.submitPost(state.form, post); }}
+            submit={() => { actions.submit(state.form, post, postId); }}
             disableSubmit={!validateContent(state.form, post)}
             updateForm={actions.updateForm}
           />
         </PostEdit>
       ) : (
         <>
-          {post ? (
-            <PostArticle post={post} editLink />
+          {post && postId ? (
+            <PostArticle post={post} postId={postId} editLink />
           ) : (
-            <p>Post does not exist</p>
+            <p>
+              {/* TODO: Create proper post-does-not-exist page */}
+              Post does not exist
+            </p>
           )}
         </>
       )}
     </Layout>
   );
 };
+
+Posts.defaultProps = { post: undefined, postId: undefined };
 
 Posts.getInitialProps = async (context) => {
   const { id, edit, create } = context.query;
@@ -244,12 +256,13 @@ Posts.getInitialProps = async (context) => {
     const postRequest = await firebase.firestore().collection('posts').doc(id).get();
 
     if (postRequest.exists) {
-      post = { id, ...postRequest.data() };
+      post = { ...postRequest.data() };
     }
   }
 
   return {
     post,
+    postId: id,
     create,
     edit,
   };
