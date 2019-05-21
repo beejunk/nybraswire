@@ -1,8 +1,8 @@
 import { Col, Row } from 'reactstrap';
 import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
-import withAuth from '../components/shared/withAuth';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
+import useAuth from '../hooks/useAuth';
 
 const uiConfig = {
   signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
@@ -12,27 +12,32 @@ const uiConfig = {
   credentialHelper: 'none',
 };
 
-const Login = ({ user }) => (
-  <Layout title="Login">
-    <Row className="Login">
-      {user ? (
-        <Col>
-          <p>
-            Already logged in with
-            {' '}
-            {user.email}
-          </p>
-        </Col>
-      ) : (
-        <Col>
-          <FirebaseAuth
-            uiConfig={uiConfig}
-            firebaseAuth={firebase.auth()}
-          />
-        </Col>
-      )}
-    </Row>
-  </Layout>
-);
+const Login = () => {
+  const user = useAuth();
 
-export default withAuth(Login);
+  return (
+    <Layout title="Login">
+      <Row className="Login">
+        {user ? (
+          <Col>
+            <p>
+              {/* TODO: Make nicer already-logged-in page */}
+              Already logged in with
+              {' '}
+              {user.email}
+            </p>
+          </Col>
+        ) : (
+          <Col>
+            <FirebaseAuth
+              uiConfig={uiConfig}
+              firebaseAuth={firebase.auth()}
+            />
+          </Col>
+        )}
+      </Row>
+    </Layout>
+  );
+};
+
+export default Login;

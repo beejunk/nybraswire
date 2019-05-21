@@ -806,15 +806,19 @@ declare type $npm$firebase$app$exports = {
   FirebaseUser: typeof $npm$firebase$auth$User,
   FirebaseUserInfo: typeof $npm$firebase$auth$UserInfo,
   app: $Exports<'@firebase/app'>,
-  auth: $Exports<'firebase/auth'>,
-  database: $Exports<'firebase/database'>,
-  firestore: $Exports<'firebase/firestore'>,
-  messaging: $Exports<'firebase/messaging'>,
-  storage: $Exports<'firebase/storage'>
+  auth: $Exports<'@firebase/auth'>,
+  database: $Exports<'@firebase/database'>,
+  firestore: $Exports<'@firebase/firestore'>,
+  messaging: $Exports<'@firebase/messaging'>,
+  storage: $Exports<'@firebase/storage'>
 };
 
 // Exporting the types
 declare module 'firebase' {
+  declare module.exports: $npm$firebase$app$exports;
+}
+
+declare module 'firebase/app' {
   declare module.exports: $npm$firebase$app$exports;
 }
 
