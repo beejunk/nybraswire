@@ -5,9 +5,10 @@ import Router from 'next/router';
 import { Alert } from 'reactstrap';
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
-import PostEdit from '../components/posts/PostEdit';
+import PostEditPage from '../components/posts/PostEditPage';
 import PostArticle from '../components/posts/PostArticle';
 import PostEditForm from '../components/posts/PostEditForm';
+import { getLocalDate, getLocalTime } from '../utils/dateUtils';
 
 import type { AlertState, FormState, PostType } from '../types/posts';
 
@@ -99,7 +100,16 @@ const generateActions = (dispatch: Dispatch) => ({
   async createPost(form: FormState) {
     const firestore = firebase.firestore();
     const ref = firestore.collection('posts');
-    const request = ref.add(form);
+    const postedOn = new Date(`${form.postedOnDate}T${form.postedOnTime}`).getTime();
+    const post: PostType = {
+      title: form.title,
+      body: form.body,
+      createdOn: postedOn,
+      updatedOn: postedOn,
+      postedOn,
+      published: true, // TODO: Implement `published` field.
+    };
+    const request = ref.add(post);
 
     try {
       const docRef = await request;
@@ -113,7 +123,24 @@ const generateActions = (dispatch: Dispatch) => ({
   async updatePost(form: FormState, post: PostType, postId: string) {
     const firestore = firebase.firestore();
     const ref = firestore.collection('posts').doc(postId);
-    const request = await ref.update({ ...post, ...form });
+    const postedOn = new Date(`${form.postedOnDate}T${form.postedOnTime}`).getTime();
+    const updatedPost = {};
+
+    updatedPost.updatedOn = Date.now();
+
+    if (post.postedOn !== postedOn) {
+      updatedPost.postedOn = postedOn;
+    }
+
+    if (post.title !== form.title) {
+      updatedPost.title = form.title;
+    }
+
+    if (post.body !== form.body) {
+      updatedPost.body = form.body;
+    }
+
+    const request = await ref.update(updatedPost);
 
     try {
       await request;
@@ -164,10 +191,20 @@ const validateContent = (form: FormState, post?: PostType) => {
 const getFormStateFromPost = (post: PostType) => ({
   title: post.title,
   body: post.body,
-  postedOn: post.postedOn,
+  postedOnDate: getLocalDate(post.postedOn),
+  postedOnTime: getLocalTime(post.postedOn),
 });
 
-const getDefaultFormState = () => ({ title: '', body: '', postedOn: Date.now() });
+const getDefaultFormState = () => {
+  const now = Date.now();
+
+  return {
+    title: '',
+    body: '',
+    postedOnDate: getLocalDate(now),
+    postedOnTime: getLocalTime(now),
+  };
+};
 
 // ---------
 // Component
@@ -198,7 +235,7 @@ const Posts = (props: Props) => {
       // If already viewing a post when navigating to the create page, then the
       // title and body need to be cleared or else the form will get populated
       // with the post data.
-      actions.updateForm({ title: '', body: '', postedOn: Date.now() });
+      actions.updateForm(getDefaultFormState());
       actions.setShouldClearForm(false);
     } else if (!create && !state.shouldClearForm) {
       // When navigating away from the create page to any other 'posts' page,
@@ -218,7 +255,7 @@ const Posts = (props: Props) => {
       </Alert>
 
       {edit || create ? (
-        <PostEdit
+        <PostEditPage
           form={state.form}
           togglePreview={actions.togglePreview}
           preview={state.preview}
@@ -229,7 +266,7 @@ const Posts = (props: Props) => {
             disableSubmit={!validateContent(state.form, post)}
             updateForm={actions.updateForm}
           />
-        </PostEdit>
+        </PostEditPage>
       ) : (
         <>
           {post && postId ? (

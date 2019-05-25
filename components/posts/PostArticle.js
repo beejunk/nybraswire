@@ -24,8 +24,6 @@ const PostArticle = (props: Props) => {
     editLink = true,
   } = props;
 
-  const user = useAuth();
-
   useEffect(() => {
     hljs.initHighlighting();
 
@@ -37,6 +35,12 @@ const PostArticle = (props: Props) => {
       hljs.initHighlighting.called = false;
     };
   });
+
+  const user = useAuth();
+
+  const postedOnStr = post.postedOn && typeof post.postedOn === 'number'
+    ? new Date(post.postedOn).toDateString()
+    : '';
 
   return (
     <article className="PostArticle">
@@ -55,6 +59,16 @@ const PostArticle = (props: Props) => {
           </Col>
         )}
       </Row>
+
+      {postedOnStr && (
+        <Row>
+          <Col>
+            <p>
+              <small>{postedOnStr}</small>
+            </p>
+          </Col>
+        </Row>
+      )}
 
       <Row>
         <Col>

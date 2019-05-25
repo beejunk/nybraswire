@@ -15,7 +15,7 @@ type Props = {
   children: any,
 };
 
-const PostEdit = ({
+const PostEditPage = ({
   form,
   preview,
   togglePreview,
@@ -24,7 +24,7 @@ const PostEdit = ({
   const user = useAuth();
 
   return (
-    <div className="PostEdit">
+    <div className="PostEditPage">
       {user ? (
         <>
           {preview ? (
@@ -61,4 +61,4 @@ const PostEdit = ({
   );
 };
 
-export default PostEdit;
+export default PostEditPage;

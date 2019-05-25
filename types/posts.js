@@ -9,13 +9,15 @@ export type AlertState = {
 export type FormState = {
   +title: string,
   +body: string,
-  +postedOn: number,
+  +postedOnDate: string,
+  +postedOnTime: string,
 };
 
-export type PostType =
-  & FormState
-  & {
-    +createdOn: number,
-    +updatedOn: number,
-    +active: boolean,
-  };
+export type PostType = {
+  +title: string,
+  +body: string,
+  +createdOn: number,
+  +updatedOn: number,
+  +postedOn: number,
+  +published: boolean
+};
