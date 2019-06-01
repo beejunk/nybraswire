@@ -8,14 +8,6 @@ const PAGE_TITLE = 'Recent Posts';
 
 const Index = ({ posts = [] }) => (
   <Layout title={PAGE_TITLE}>
-    <Row className="border-bottom mb-3">
-      <Col>
-        <h1>
-          {PAGE_TITLE}
-        </h1>
-      </Col>
-    </Row>
-
     <Row>
       <Col>
         <ul css={{ listStyleType: 'none' }}>
@@ -24,13 +16,16 @@ const Index = ({ posts = [] }) => (
               key={post.id}
               css={{
                 display: 'flex',
-                alignItems: 'center',
+                alignItems: 'flex-end',
               }}
             >
               <DateBadge timestamp={post.postedOn} />
-              <Link as={`/posts/${post.id}`} href={`/posts?id=${post.id}`}>
-                <a css={{ marginLeft: '1rem' }}>{post.title}</a>
-              </Link>
+
+              <h2 css={{ marginLeft: '1rem' }}>
+                <Link as={`/posts/${post.id}`} href={`/posts?id=${post.id}`}>
+                  <a>{post.title}</a>
+                </Link>
+              </h2>
             </li>
           ))}
         </ul>
