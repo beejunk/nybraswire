@@ -1,43 +1,40 @@
-import Link from 'next/link';
-import { Col, Row } from 'reactstrap';
+// @flow
+
+import React from 'react';
 import Layout from '../components/shared/Layout';
-import DateBadge from '../components/shared/DateBadge';
+import PostArticle from '../components/posts/PostArticle';
 import firebase from '../firebase';
+
+import type { PostType } from '../types/posts';
 
 const PAGE_TITLE = 'Recent Posts';
 
-const Index = ({ posts = [] }) => (
-  <Layout title={PAGE_TITLE}>
-    <Row>
-      <Col>
-        <ul css={{ listStyleType: 'none' }}>
-          {posts.map(post => (
-            <li
-              key={post.id}
-              css={{
-                display: 'flex',
-                alignItems: 'flex-end',
-              }}
-            >
-              <DateBadge timestamp={post.postedOn} />
+type Props = {
+  posts: Array<{ data: PostType, id: string}>
+};
 
-              <h2 css={{ marginLeft: '1rem' }}>
-                <Link as={`/posts/${post.id}`} href={`/posts?id=${post.id}`}>
-                  <a>{post.title}</a>
-                </Link>
-              </h2>
-            </li>
-          ))}
-        </ul>
-      </Col>
-    </Row>
-  </Layout>
-);
+const Index = (props: Props) => {
+  const { posts } = props;
+
+  return (
+    <Layout title={PAGE_TITLE}>
+      {posts.map(post => (
+        <PostArticle
+          key={post.id}
+          post={post.data}
+          postId={post.id}
+          summary
+        />
+      ))}
+    </Layout>
+  );
+};
 
 Index.getInitialProps = async () => {
   const querySnapshot = await firebase.firestore().collection('posts').get();
   const posts = [];
-  querySnapshot.forEach(doc => posts.push({ ...doc.data(), id: doc.id }));
+
+  querySnapshot.forEach(doc => posts.push({ data: doc.data(), id: doc.id }));
 
   return { posts };
 };

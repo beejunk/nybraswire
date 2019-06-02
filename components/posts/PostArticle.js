@@ -6,6 +6,7 @@ import hljs from 'highlight.js/lib/highlight';
 import { Col, Row } from 'reactstrap';
 import ReactMarkdown from 'react-markdown';
 import useAuth from '../../hooks/useAuth';
+import DateBadge from '../shared/DateBadge';
 
 import type { FormState, PostType } from '../../types/posts';
 
@@ -14,7 +15,23 @@ const ROUTE = '/posts';
 type Props = {
   post: PostType | FormState,
   postId?: string,
-  editLink: boolean,
+  editLink?: boolean,
+  summary?: boolean
+};
+
+const getSummary = (body: string, maxLength: number = 200) => {
+  // Set summary to be the first paragraph;
+  let summary = body.split('\n')[0];
+
+  if (summary.length > maxLength) {
+    // Truncate summary if it is too long.
+    summary = summary.slice(0, maxLength);
+
+    // Remove any incomplete words and add an elipses.
+    summary = `${summary.slice(0, summary.lastIndexOf(' '))} ...`;
+  }
+
+  return summary;
 };
 
 const PostArticle = (props: Props) => {
@@ -22,6 +39,7 @@ const PostArticle = (props: Props) => {
     post,
     postId,
     editLink = true,
+    summary,
   } = props;
 
   useEffect(() => {
@@ -38,15 +56,25 @@ const PostArticle = (props: Props) => {
 
   const user = useAuth();
 
-  const postedOnStr = post.postedOn && typeof post.postedOn === 'number'
-    ? new Date(post.postedOn).toDateString()
-    : '';
+  const body = summary ? getSummary(post.body) : post.body;
 
   return (
     <article className="PostArticle">
       <Row className="border-bottom mb-3 align-items-center">
-        <Col>
-          <h1>{post.title}</h1>
+        <Col className="mb-3" css={{ display: 'flex', alignItems: 'center' }}>
+          <DateBadge timestamp={post.postedOn || Date.now()} />
+
+          {postId && summary ? (
+            <h2 className="ml-3">
+              <Link as={`/posts/${postId}`} href={`/posts?id=${postId}`}>
+                <a>{post.title}</a>
+              </Link>
+            </h2>
+          ) : (
+            <h1 className="ml-3">
+              {post.title}
+            </h1>
+          )}
         </Col>
 
         {user && editLink && postId && (
@@ -60,25 +88,19 @@ const PostArticle = (props: Props) => {
         )}
       </Row>
 
-      {postedOnStr && (
-        <Row>
-          <Col>
-            <p>
-              <small>{postedOnStr}</small>
-            </p>
-          </Col>
-        </Row>
-      )}
-
       <Row>
         <Col>
-          <ReactMarkdown source={post.body} />
+          <ReactMarkdown source={body} />
         </Col>
       </Row>
     </article>
   );
 };
 
-PostArticle.defaultProps = { postId: undefined };
+PostArticle.defaultProps = {
+  postId: undefined,
+  editLink: false,
+  summary: false,
+};
 
 export default PostArticle;
