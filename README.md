@@ -1,3 +1,3 @@
 # Nybras Wire
 
-Simple blogging application built on Next.js and Firebase.
+No-frills blogging application built on Next.js and Firebase.
