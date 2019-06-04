@@ -1,3 +1,6 @@
+// @flow
+
+import React from 'react';
 import { Col, Row } from 'reactstrap';
 import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
 import Layout from '../components/shared/Layout';

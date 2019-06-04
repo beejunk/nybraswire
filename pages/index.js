@@ -31,7 +31,13 @@ const Index = (props: Props) => {
 };
 
 Index.getInitialProps = async () => {
-  const querySnapshot = await firebase.firestore().collection('posts').get();
+  const firestore = firebase.firestore();
+  const postCollection = firestore.collection('posts');
+  const querySnapshot = await postCollection
+    .orderBy('postedOn', 'desc')
+    .limit(5)
+    .get();
+
   const posts = [];
 
   querySnapshot.forEach((doc) => {

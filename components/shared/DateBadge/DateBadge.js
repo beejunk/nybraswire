@@ -1,7 +1,8 @@
 // @flow
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { getMonthStr, appendSuffixToDate, getFormattedTime } from '../../../utils/dateUtils';
+import ThemeContext from '../../../theme';
 
 type Props = {
   timestamp: number,
@@ -9,6 +10,7 @@ type Props = {
 
 const DateBadge = (props: Props) => {
   const { timestamp } = props;
+  const { colors } = useContext(ThemeContext);
   const date = new Date(timestamp);
   const dayOfMonth = appendSuffixToDate(date.getDate());
   const month = getMonthStr(date.getMonth());
@@ -19,7 +21,7 @@ const DateBadge = (props: Props) => {
       className="DateBadge"
       css={{
         borderRadius: '5px',
-        backgroundColor: '#000',
+        backgroundColor: colors.gray900,
         display: 'flex',
         color: '#fff',
         flexDirection: 'column',

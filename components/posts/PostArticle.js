@@ -93,6 +93,16 @@ const PostArticle = (props: Props) => {
           <ReactMarkdown source={body} />
         </Col>
       </Row>
+
+      {summary && postId && (
+        <Row>
+          <Col className="text-right">
+            <Link as={`/posts/${postId}`} href={`/posts?id=${postId}`}>
+              <a><small>Read more &gt;</small></a>
+            </Link>
+          </Col>
+        </Row>
+      )}
     </article>
   );
 };
