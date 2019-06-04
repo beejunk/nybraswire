@@ -34,7 +34,9 @@ Index.getInitialProps = async () => {
   const querySnapshot = await firebase.firestore().collection('posts').get();
   const posts = [];
 
-  querySnapshot.forEach(doc => posts.push({ data: doc.data(), id: doc.id }));
+  querySnapshot.forEach((doc) => {
+    posts.push({ data: doc.data(), id: doc.id });
+  });
 
   return { posts };
 };
