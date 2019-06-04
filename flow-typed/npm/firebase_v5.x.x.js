@@ -805,13 +805,83 @@ declare type $npm$firebase$app$exports = {
   FirebaseConfig: $npm$firebase$Config,
   FirebaseUser: typeof $npm$firebase$auth$User,
   FirebaseUserInfo: typeof $npm$firebase$auth$UserInfo,
-  app: $Exports<'@firebase/app'>,
-  auth: $Exports<'@firebase/auth'>,
-  database: $Exports<'@firebase/database'>,
-  firestore: $Exports<'@firebase/firestore'>,
-  messaging: $Exports<'@firebase/messaging'>,
-  storage: $Exports<'@firebase/storage'>
+  auth: $npm$firebase$auth$exports,
+  database: $npm$firebase$database$exports,
+  firestore: $npm$firebase$firestore$exports,
+  messaging: $npm$firebase$messaging$exports,
+  storage: $npm$firebase$storage$exports
 };
+
+declare type $npm$firebase$auth$exports = {
+  (app?: $npm$firebase$App): $npm$firebase$auth$Auth,
+  FirebaseAdditionalUserInfo: $npm$firebase$auth$AdditionalUserInfo,
+  FirebaseUserCredential: $npm$firebase$auth$UserCredential,
+  ActionCodeInfo: $npm$firebase$auth$ActionCodeInfo,
+  ApplicationVerifier: $npm$firebase$auth$ApplicationVerifier,
+  Auth: typeof $npm$firebase$auth$Auth,
+  AuthCredential: $npm$firebase$auth$AuthCredential,
+  AuthProvider: $npm$firebase$auth$AuthProvider,
+  ConfirmationResult: $npm$firebase$auth$ConfirmationResult,
+  EmailAuthProvider: typeof $npm$firebase$auth$EmailAuthProvider,
+  Error: $npm$firebase$auth$Error,
+  FacebookAuthProvider: typeof $npm$firebase$auth$FacebookAuthProvider,
+  GithubAuthProvider: typeof $npm$firebase$auth$GithubAuthProvider,
+  GoogleAuthProvider: typeof $npm$firebase$auth$GoogleAuthProvider,
+  PhoneAuthProvider: typeof $npm$firebase$auth$PhoneAuthProvider,
+  TwitterAuthProvider: typeof $npm$firebase$auth$TwitterAuthProvider
+}
+
+declare type $npm$firebase$database$exports = {
+  (app?: $npm$firebase$App): $npm$firebase$database$Database,
+  enableLogging(
+    logger?: boolean | ((msg: string) => void),
+    persistent?: boolean
+  ): void,
+  DataSnapshot: typeof $npm$firebase$database$DataSnapshot,
+  Database: typeof $npm$firebase$database$Database,
+  OnDisconnect: typeof $npm$firebase$database$OnDisconnect,
+  Query: typeof $npm$firebase$database$Query,
+  Reference: typeof $npm$firebase$database$Reference,
+  ServerValue: typeof $npm$firebase$database$ServerValue,
+  ThenableReference: typeof $npm$firebase$database$ThenableReference
+}
+
+declare type $npm$firebase$firestore$exports = {
+  (app?: $npm$firebase$App): $npm$firebase$firestore$Firestore,
+  Blob: $npm$firebase$firestore$Blob,
+  CollectionReference: typeof $npm$firebase$firestore$CollectionReference,
+  DocumentChange: $npm$firebase$firestore$DocumentChange,
+  DocumentReference: typeof $npm$firebase$firestore$DocumentReference,
+  DocumentSnapshot: typeof $npm$firebase$firestore$DocumentSnapshot,
+  FieldPath: typeof $npm$firebase$firestore$FieldPath,
+  FieldValue: typeof $npm$firebase$firestore$FieldValue,
+  Firestore: typeof $npm$firebase$firestore$Firestore,
+  FirestoreError: $npm$firebase$firestore$FirestoreError,
+  GeoPoint: typeof $npm$firebase$firestore$GeoPoint,
+  Query: typeof $npm$firebase$firestore$Query,
+  QueryListenOptions: $npm$firebase$firestore$QueryListenOptions,
+  QuerySnapshot: typeof $npm$firebase$firestore$QuerySnapshot,
+  Settings: $npm$firebase$firestore$Settings,
+  SnapshotMetadata: $npm$firebase$firestore$SnapshotMetadata,
+  Transaction: $npm$firebase$firestore$Transaction,
+  WriteBatch: $npm$firebase$firestore$WriteBatch
+}
+
+declare type $npm$firebase$messaging$exports = {
+  (app?: $npm$firebase$App): $npm$firebase$messaging$Messaging,
+  Messaging: $npm$firebase$messaging$Messaging
+}
+
+declare type $npm$firebase$storage$exports = {
+  (app?: $npm$firebase$App): $npm$firebase$storage$Storage,
+  Storage: typeof $npm$firebase$storage$Storage,
+  FullMetadata: typeof $npm$firebase$storage$FullMetadata,
+  Reference: typeof $npm$firebase$storage$Reference,
+  SettableMetadata: typeof $npm$firebase$storage$SettableMetadata,
+  UploadMetadata: typeof $npm$firebase$storage$UploadMetadata,
+  UploadTask: typeof $npm$firebase$storage$UploadTask,
+  UploadTaskSnapshot: typeof $npm$firebase$storage$UploadTaskSnapshot
+}
 
 // Exporting the types
 declare module 'firebase' {
@@ -846,24 +916,7 @@ declare module '@firebase/app' {
 }
 
 declare module '@firebase/auth' {
-  declare module.exports: {
-    (app?: $npm$firebase$App): $npm$firebase$auth$Auth,
-    FirebaseAdditionalUserInfo: $npm$firebase$auth$AdditionalUserInfo,
-    FirebaseUserCredential: $npm$firebase$auth$UserCredential,
-    ActionCodeInfo: $npm$firebase$auth$ActionCodeInfo,
-    ApplicationVerifier: $npm$firebase$auth$ApplicationVerifier,
-    Auth: typeof $npm$firebase$auth$Auth,
-    AuthCredential: $npm$firebase$auth$AuthCredential,
-    AuthProvider: $npm$firebase$auth$AuthProvider,
-    ConfirmationResult: $npm$firebase$auth$ConfirmationResult,
-    EmailAuthProvider: typeof $npm$firebase$auth$EmailAuthProvider,
-    Error: $npm$firebase$auth$Error,
-    FacebookAuthProvider: typeof $npm$firebase$auth$FacebookAuthProvider,
-    GithubAuthProvider: typeof $npm$firebase$auth$GithubAuthProvider,
-    GoogleAuthProvider: typeof $npm$firebase$auth$GoogleAuthProvider,
-    PhoneAuthProvider: typeof $npm$firebase$auth$PhoneAuthProvider,
-    TwitterAuthProvider: typeof $npm$firebase$auth$TwitterAuthProvider
-  };
+  declare module.exports: $npm$firebase$auth$exports;
 }
 
 declare module 'firebase/storage' {
@@ -871,61 +924,17 @@ declare module 'firebase/storage' {
 }
 
 declare module '@firebase/database' {
-  declare module.exports: {
-    (app?: $npm$firebase$App): $npm$firebase$database$Database,
-    enableLogging(
-      logger?: boolean | ((msg: string) => void),
-      persistent?: boolean
-    ): void,
-    DataSnapshot: typeof $npm$firebase$database$DataSnapshot,
-    Database: typeof $npm$firebase$database$Database,
-    OnDisconnect: typeof $npm$firebase$database$OnDisconnect,
-    Query: typeof $npm$firebase$database$Query,
-    Reference: typeof $npm$firebase$database$Reference,
-    ServerValue: typeof $npm$firebase$database$ServerValue,
-    ThenableReference: typeof $npm$firebase$database$ThenableReference
-  };
+  declare module.exports: $npm$firebase$database$exports;
 }
 
 declare module '@firebase/firestore' {
-  declare module.exports: {
-    (app?: $npm$firebase$App): $npm$firebase$firestore$Firestore,
-    Blob: $npm$firebase$firestore$Blob,
-    CollectionReference: typeof $npm$firebase$firestore$CollectionReference,
-    DocumentChange: $npm$firebase$firestore$DocumentChange,
-    DocumentReference: typeof $npm$firebase$firestore$DocumentReference,
-    DocumentSnapshot: typeof $npm$firebase$firestore$DocumentSnapshot,
-    FieldPath: typeof $npm$firebase$firestore$FieldPath,
-    FieldValue: typeof $npm$firebase$firestore$FieldValue,
-    Firestore: typeof $npm$firebase$firestore$Firestore,
-    FirestoreError: $npm$firebase$firestore$FirestoreError,
-    GeoPoint: typeof $npm$firebase$firestore$GeoPoint,
-    Query: typeof $npm$firebase$firestore$Query,
-    QueryListenOptions: $npm$firebase$firestore$QueryListenOptions,
-    QuerySnapshot: typeof $npm$firebase$firestore$QuerySnapshot,
-    Settings: $npm$firebase$firestore$Settings,
-    SnapshotMetadata: $npm$firebase$firestore$SnapshotMetadata,
-    Transaction: $npm$firebase$firestore$Transaction,
-    WriteBatch: $npm$firebase$firestore$WriteBatch
-  };
+  declare module.exports: $npm$firebase$firestore$exports;
 }
 
 declare module '@firebase/messaging' {
-  declare module.exports: {
-    (app?: $npm$firebase$App): $npm$firebase$messaging$Messaging,
-    Messaging: $npm$firebase$messaging$Messaging
-  };
+  declare module.exports: $npm$firebase$messaging$exports;
 }
 
 declare module '@firebase/storage' {
-  declare module.exports: {
-    (app?: $npm$firebase$App): $npm$firebase$storage$Storage,
-    Storage: typeof $npm$firebase$storage$Storage,
-    FullMetadata: typeof $npm$firebase$storage$FullMetadata,
-    Reference: typeof $npm$firebase$storage$Reference,
-    SettableMetadata: typeof $npm$firebase$storage$SettableMetadata,
-    UploadMetadata: typeof $npm$firebase$storage$UploadMetadata,
-    UploadTask: typeof $npm$firebase$storage$UploadTask,
-    UploadTaskSnapshot: typeof $npm$firebase$storage$UploadTaskSnapshot
-  };
+  declare module.exports: $npm$firebase$storage$exports;
 }
