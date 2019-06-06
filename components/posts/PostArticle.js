@@ -19,19 +19,23 @@ type Props = {
   summary?: boolean
 };
 
-const getSummary = (body: string, maxLength: number = 200) => {
-  // Set summary to be the first paragraph;
-  let summary = body.split('\n')[0];
-
-  if (summary.length > maxLength) {
-    // Truncate summary if it is too long.
-    summary = summary.slice(0, maxLength);
-
-    // Remove any incomplete words and add an elipses.
-    summary = `${summary.slice(0, summary.lastIndexOf(' '))} ...`;
+const appendEllipses = (body: string) => {
+  if (body.endsWith('.')) {
+    return body;
   }
 
-  return summary;
+  const lastSpace = body.lastIndexOf(' ');
+
+  return `${body.slice(0, lastSpace)} ...`;
+};
+
+const getSummary = (body: string, maxLength: number = 600) => {
+  if (body.length > maxLength) {
+    const truncatedBody = body.slice(0, maxLength);
+    return appendEllipses(truncatedBody);
+  }
+
+  return body;
 };
 
 const PostArticle = (props: Props) => {
