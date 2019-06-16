@@ -120,6 +120,6 @@ const Index = ({ postIds, postsById, pageIndex }: Props) => {
   );
 };
 
-Index.getInitialProps = () => getPage(false);
+Index.getInitialProps = () => getNextPage();
 
 export default Index;
