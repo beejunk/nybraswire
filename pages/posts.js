@@ -10,7 +10,9 @@ import PostArticle from '../components/posts/PostArticle';
 import PostEditForm from '../components/posts/PostEditForm';
 import { getLocalDate, getLocalTime } from '../utils/dateUtils';
 
-import type { AlertState, FormState, PostType } from '../types/posts';
+import type {
+  AlertState, FormState, PostType, PostCacheType,
+} from '../types/posts';
 
 // ---------
 // Constants
@@ -44,6 +46,7 @@ type Dispatch = (action: Action) => void;
 
 export type Props = {
   +post?: PostType,
+  +postCache: PostCacheType,
   +postId?: string,
   +edit: boolean,
   +create: boolean,
@@ -212,11 +215,18 @@ const getDefaultFormState = () => {
 
 const Posts = (props: Props) => {
   const {
+    postCache,
     post,
     postId,
     edit,
     create,
   } = props;
+
+  let activePost = post;
+
+  if (!activePost && postId) {
+    activePost = postCache.postsById[postId];
+  }
 
   const initialState: State = {
     alert: { color: 'success', message: '', show: false },
@@ -245,7 +255,7 @@ const Posts = (props: Props) => {
   });
 
   return (
-    <Layout title={post && !edit ? post.title : 'Create/Edit Post'}>
+    <Layout title={activePost && !edit ? activePost.title : 'Create/Edit Post'}>
       <Alert
         isOpen={state.alert.show}
         toggle={() => { actions.updateAlert({ ...state.alert, show: false }); }}
@@ -262,15 +272,15 @@ const Posts = (props: Props) => {
         >
           <PostEditForm
             form={state.form}
-            submit={() => { actions.submit(state.form, post, postId); }}
-            disableSubmit={!validateContent(state.form, post)}
+            submit={() => { actions.submit(state.form, activePost, postId); }}
+            disableSubmit={!validateContent(state.form, activePost)}
             updateForm={actions.updateForm}
           />
         </PostEditPage>
       ) : (
         <>
-          {post && postId ? (
-            <PostArticle post={post} postId={postId} editLink />
+          {activePost && postId ? (
+            <PostArticle post={activePost} postId={postId} editLink />
           ) : (
             <p>
               {/* TODO: Create proper post-does-not-exist page */}
@@ -286,10 +296,11 @@ const Posts = (props: Props) => {
 Posts.defaultProps = { post: undefined, postId: undefined };
 
 Posts.getInitialProps = async (context) => {
-  const { id, edit, create } = context.query;
+  const { req, query } = context;
+  const { id, edit, create } = query;
   let post;
 
-  if (id) {
+  if (id && req) {
     const postRequest = await firebase.firestore().collection('posts').doc(id).get();
 
     if (postRequest.exists) {

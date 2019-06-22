@@ -21,3 +21,8 @@ export type PostType = {
   +postedOn: number,
   +published: boolean
 };
+
+export type PostCacheType = {
+  postIds: string[],
+  postsById: { [id: string]: PostType },
+};

@@ -4,7 +4,12 @@ import firebase from '../firebase';
 import ThemeContext from '../theme';
 import theme from '../theme/nybraswire';
 
-class MyApp extends App {
+class MyApp extends App<Props, State> {
+  state = {
+    postIds: [],
+    postsById: {},
+  };
+
   constructor(props) {
     super(props);
 
@@ -30,13 +35,33 @@ class MyApp extends App {
     return { pageProps, themeSettings };
   }
 
+  addPostsToCache = (posts = { postsBydId: {}, postIds: [] }) => {
+    const { postIds } = this.state;
+    const newPostIds = posts.postIds.filter(postId => !postIds.includes(postId));
+    const newPostsById = {};
+
+
+    if (newPostIds.length) {
+      newPostIds.forEach((postId) => {
+        newPostsById[postId] = posts.postsById[postId];
+      });
+
+      this.setState({ postIds: newPostIds, postsById: newPostsById });
+    }
+  }
+
   render() {
     const { Component, pageProps } = this.props;
+    const { postIds, postsById } = this.state;
 
     return (
       <Container>
         <ThemeContext.Provider value={{ ...theme, ...this.themeSettings }}>
-          <Component {...pageProps} />
+          <Component
+            {...pageProps}
+            postCache={{ postIds, postsById }}
+            addPostsToCache={this.addPostsToCache}
+          />
         </ThemeContext.Provider>
       </Container>
     );
