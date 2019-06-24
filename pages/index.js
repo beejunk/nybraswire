@@ -33,8 +33,9 @@ const getPage = async (
     .orderBy('postedOn', 'desc')
     .limit(POSTS_PER_PAGE * 2);
 
-  if (currentPage && postCache && addPostsToCache) {
+  if (currentPage && postCache) {
     if (previous) {
+      // Previous pages should always exist in cache.
       const end = postCache.postIds.indexOf(currentPage.postIds[0]);
       const start = end - POSTS_PER_PAGE;
       const prevPageIds = postCache.postIds.slice(start, end);
@@ -46,12 +47,12 @@ const getPage = async (
     }
 
     const lastPostId = currentPage.postIds[currentPage.postIds.length - 1];
-    const lastPostIdx = postCache.postIds.indexOf[lastPostId];
+    const lastPostIndex = postCache.postIds.indexOf[lastPostId];
 
-    if (postCache.postIds.length > lastPostIdx + 1) {
-      const start = lastPostIdx + 1;
+    if (postCache.postIds.length > lastPostIndex + 1) {
+      const start = lastPostIndex + 1;
       const end = start + POSTS_PER_PAGE;
-      const nextPageIds = postCache.postIds.slice(lastPostIdx + 1, end);
+      const nextPageIds = postCache.postIds.slice(lastPostIndex + 1, end);
       const nextPagePostsById = nextPageIds.reduce((nextPosts, postId) => ({
         ...nextPosts, [postId]: postCache.postsById[postId],
       }), {});
@@ -59,35 +60,28 @@ const getPage = async (
       return { postIds: nextPageIds, postsById: nextPagePostsById };
     }
 
-    if (postCache) {
-      const nextPageIds = postCache.postIds.slice(POSTS_PER_PAGE);
+    if (addPostsToCache) {
+      const lastDocRef = postCollection.doc(lastPostIndex);
+      const lastDocSnapshot = await lastDocRef.get();
+
+      query = query.startAfter(lastDocSnapshot);
+
+      const querySnapshot = await query.get();
+
+      querySnapshot.forEach((doc) => {
+        postIds.push(doc.id);
+        postsById[doc.id] = doc.data();
+      });
+
+      const nextPageIds = postIds.slice(POSTS_PER_PAGE);
       const nextPagePostsById = nextPageIds.reduce((nextPosts, postId) => ({
-        ...nextPosts, [postId]: postCache[postId],
+        ...nextPosts, [postId]: postsById[postId],
       }), {});
+
+      addPostsToCache({ postIds, postsById });
 
       return { postIds: nextPageIds, postsById: nextPagePostsById };
     }
-
-    const lastDocRef = postCollection.doc(lastPostIdx);
-    const lastDocSnapshot = await lastDocRef.get();
-
-    query = query.startAfter(lastDocSnapshot);
-
-    const querySnapshot = await query.get();
-
-    querySnapshot.forEach((doc) => {
-      postIds.push(doc.id);
-      postsById[doc.id] = doc.data();
-    });
-
-    const nextPageIds = postIds.slice(POSTS_PER_PAGE);
-    const nextPagePostsById = nextPageIds.reduce((nextPosts, postId) => ({
-      ...nextPosts, [postId]: postsById[postId],
-    }), {});
-
-    addPostsToCache({ postIds, postsById });
-
-    return { postIds: nextPageIds, postsById: nextPagePostsById };
   }
 
   const querySnapshot = await query.get();
@@ -104,19 +98,25 @@ const getNextPage = getPage.bind(null, false);
 
 const getPrevPage = getPage.bind(null, true);
 
+const getFirstPageFromCache = (postCache: PostCacheType) => {
+  const nextPageIds = postCache.postIds.slice(0, POSTS_PER_PAGE);
+  const nextPagePostsById = nextPageIds.reduce((nextPosts, postId) => ({
+    ...nextPosts, [postId]: postCache.postsById[postId],
+  }), {});
+
+  return { postIds: nextPageIds, postsById: nextPagePostsById };
+};
+
 const onNextButtonClick = (
-  currentPage: Props,
-  setPage: (nextPage: Props) => void,
+  currentPage: PostCacheType,
+  setPage: (nextPage: PostCacheType) => void,
 ) => async () => {
   const nextPage = await getNextPage(currentPage);
-
-  if (nextPage.postIds.length) {
-    setPage(nextPage);
-  }
+  setPage(nextPage);
 };
 
 const onPrevButtonClick = (
-  currentPage: Props,
+  currentPage: PostCacheType,
   setPage: (nextPage: Props) => void,
 ) => async () => {
   const prevPage = await getPrevPage(currentPage);
@@ -137,8 +137,8 @@ const hasNextPage = (currentPageIds: string[], postIds: string[]) => {
 };
 
 const Index = ({ addPostsToCache, firstPage, postCache }: Props) => {
-  const initialPage = firstPage || getPage(false, undefined, postCache);
-  const [page, setPage] = useState(initialPage);
+  const initialPageState = firstPage || getFirstPageFromCache(postCache);
+  const [page, setPage] = useState(initialPageState);
 
   useEffect(() => {
     // NOTE: Cache-related actions should only run client-side
