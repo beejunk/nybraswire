@@ -18,10 +18,10 @@ import type {
 // Constants
 // ---------
 
-export const UPDATE_ALERT = 'UPDATE_ALERT';
-export const UPDATE_FORM = 'UPDATE_FORM';
-export const TOGGLE_PREVIEW = 'TOGGLE_PREVIEW';
-export const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
+const UPDATE_ALERT = 'UPDATE_ALERT';
+const UPDATE_FORM = 'UPDATE_FORM';
+const TOGGLE_PREVIEW = 'TOGGLE_PREVIEW';
+const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
 
 // -------------------------
 // Action and dispatch types
