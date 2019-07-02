@@ -65,7 +65,7 @@ const PostArticle = (props: Props) => {
   return (
     <article className="PostArticle">
       <Row className="border-bottom mb-3 align-items-center">
-        <Col className="mb-3" css={{ display: 'flex', alignItems: 'center' }}>
+        <Col xs={12} sm={10} className="mb-3" css={{ display: 'flex', alignItems: 'center' }}>
           <DateBadge timestamp={post.postedOn || Date.now()} />
 
           {postId && summary ? (
@@ -82,7 +82,7 @@ const PostArticle = (props: Props) => {
         </Col>
 
         {user && editLink && postId && (
-          <Col xs={3} className="text-right">
+          <Col xs={12} sm={2} className="text-right">
             <Link as={`${ROUTE}/${postId}/edit`} href={`/${ROUTE}?id=${postId}&edit=true`}>
               <a>
                 Edit

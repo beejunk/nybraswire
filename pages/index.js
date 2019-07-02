@@ -58,7 +58,7 @@ const Index = ({
 
     <Row>
       {hasPrevPage(currentPageIds, postCache.postIds) && (
-        <Col xs={2}>
+        <Col xs={4} sm={3} md={2}>
           <Button onClick={getPrevPage} block>
             Previous
           </Button>
@@ -66,7 +66,7 @@ const Index = ({
       )}
 
       {hasNextPage(currentPageIds, postCache.postIds) && (
-        <Col xs={2}>
+        <Col xs={4} sm={3} md={2}>
           <Button onClick={getNextPage} block>
             Next
           </Button>

@@ -16,6 +16,7 @@ const DateBadge = (props: Props) => {
   const month = getMonthStr(date.getMonth());
   const time = getFormattedTime(date);
 
+  // TODO: Why is minWidth necessary here?
   return (
     <div
       className="DateBadge"
@@ -30,6 +31,7 @@ const DateBadge = (props: Props) => {
         lineHeight: '1.25rem',
         width: '4.5rem',
         height: '4.5rem',
+        minWidth: '4.5rem',
       }}
     >
       <div css={{ fontWeight: 700 }}>{month}</div>
