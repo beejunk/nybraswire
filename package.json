@@ -3,6 +3,10 @@
   "version": "0.1.2",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">= 10.3.0",
+    "npm": ">= 6.9.0"
+  },
   "scripts": {
     "dev": "node --inspect server",
     "build": "next build",
