@@ -14,6 +14,7 @@ const DateBadge = (props: Props) => {
   const date = new Date(timestamp);
   const dayOfMonth = appendSuffixToDate(date.getDate());
   const month = getMonthStr(date.getMonth());
+  const year = date.getFullYear();
   const time = getFormattedTime(date);
 
   // TODO: Why is minWidth necessary here?
@@ -29,14 +30,15 @@ const DateBadge = (props: Props) => {
         alignItems: 'center',
         justifyContent: 'center',
         lineHeight: '1.25rem',
-        width: '4.5rem',
-        height: '4.5rem',
-        minWidth: '4.5rem',
+        width: '5rem',
+        height: '5rem',
+        minWidth: '5rem',
       }}
     >
+      <div css={{ fontSize: '0.5rem', lineHeight: '0.5rem' }}>{year}</div>
       <div css={{ fontWeight: 700 }}>{month}</div>
       <div>{dayOfMonth}</div>
-      <div css={{ fontSize: '0.5rem' }}>{time}</div>
+      <div css={{ fontSize: '0.5rem', lineHeight: '0.75rem' }}>{time}</div>
     </div>
   );
 };

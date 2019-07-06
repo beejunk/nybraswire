@@ -1,18 +1,18 @@
 // @flow
 
 const MONTHS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
+  'Jan.',
+  'Feb.',
+  'March',
+  'April',
   'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
+  'June',
+  'July',
+  'August',
+  'Sep.',
+  'Oct.',
+  'Nov.',
+  'Dec.',
 ];
 
 const getLocalISOFromTimestamp = (timestamp: number) => {
