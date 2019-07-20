@@ -252,7 +252,7 @@ const Posts = (props: Props) => {
       // mark the form as needing to be cleared.
       actions.setShouldClearForm(true);
     }
-  });
+  }, []);
 
   return (
     <Layout title={activePost && !edit ? activePost.title : 'Create/Edit Post'}>

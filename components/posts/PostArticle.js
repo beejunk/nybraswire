@@ -56,7 +56,7 @@ const PostArticle = (props: Props) => {
     return () => {
       hljs.initHighlighting.called = false;
     };
-  });
+  }, []);
 
   const user = useAuth();
 
