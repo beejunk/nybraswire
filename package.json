@@ -10,7 +10,8 @@
     "dev": "node --inspect server",
     "build": "next build",
     "start": "NODE_ENV=production node server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --watch --runInBand"
   },
   "keywords": [],
   "author": "",
@@ -41,6 +42,9 @@
     "@babel/preset-flow": "^7.0.0",
     "@emotion/babel-preset-css-prop": "^10.0.9",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.8.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
     "eslint": "^5.15.3",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-plugin-flowtype": "^3.8.1",
@@ -49,6 +53,15 @@
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-react-hooks": "^1.6.0",
     "flow-bin": "^0.98.1",
+    "jest": "^24.8.0",
     "webpack": "^4.30.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "<rootDir>/jestSetup.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|scss)$": "<rootDir>/__mocks__/styleMock.js"
+    }
   }
 }
