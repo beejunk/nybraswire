@@ -41,6 +41,7 @@
     "@babel/core": "^7.4.3",
     "@babel/preset-flow": "^7.0.0",
     "@emotion/babel-preset-css-prop": "^10.0.9",
+    "@types/react": "^16.9.5",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.8.0",
     "enzyme": "^3.10.0",
@@ -54,6 +55,7 @@
     "eslint-plugin-react-hooks": "^1.6.0",
     "flow-bin": "^0.98.1",
     "jest": "^24.8.0",
+    "typescript": "^3.6.4",
     "webpack": "^4.30.0"
   },
   "jest": {

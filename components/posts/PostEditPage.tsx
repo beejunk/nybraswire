@@ -1,15 +1,13 @@
-// @flow
-
 import React from 'react';
 import { Col, Button, Row } from 'reactstrap';
 import Link from 'next/link';
 import PostArticle from './PostArticle';
 import useAuth from '../../hooks/useAuth';
 
-import type { FormState } from '../../types/posts';
+import { FormState, PostType } from '../../types/posts';
 
-type Props = {
-  form: FormState,
+interface Props {
+  form: FormState & PostType,
   preview: boolean,
   togglePreview: (boolean) => void,
   children: any,

@@ -1,5 +1,3 @@
-// @flow
-
 import React from 'react';
 import {
   Button,
@@ -11,9 +9,9 @@ import {
   Row,
 } from 'reactstrap';
 
-import type { FormState } from '../../types/posts';
+import { FormState } from '../../types/posts';
 
-type Props = {
+interface Props {
   form: FormState,
   disableSubmit: boolean,
   updateForm: (form: FormState) => void,
@@ -26,16 +24,16 @@ const PostEditForm = ({
   updateForm,
   submit,
 }: Props) => {
-  const handlePostChange = (field: string) => (ev: SyntheticKeyboardEvent<HTMLInputElement>) => {
+  const handlePostChange = (field: string) => (ev: React.KeyboardEvent<HTMLInputElement>) => {
     updateForm({ ...form, [field]: ev.currentTarget.value });
   };
 
-  const handleDateChange = (ev: SyntheticKeyboardEvent<HTMLInputElement>) => {
+  const handleDateChange = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     const postedOnDate = ev.currentTarget.value;
     updateForm({ ...form, postedOnDate });
   };
 
-  const handleTimeChange = (ev: SyntheticKeyboardEvent<HTMLInputElement>) => {
+  const handleTimeChange = (ev: React.KeyboardEvent<HTMLInputElement>) => {
     const postedOnTime = ev.currentTarget.value;
     updateForm({ ...form, postedOnTime });
   };

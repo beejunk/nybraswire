@@ -1,10 +1,8 @@
-// @flow
-
 import React, { useContext } from 'react';
 import { getMonthStr, appendSuffixToDate, getFormattedTime } from '../../../utils/dateUtils';
 import ThemeContext from '../../../theme';
 
-type Props = {
+interface Props {
   timestamp: number,
 };
 

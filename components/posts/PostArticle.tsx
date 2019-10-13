@@ -1,5 +1,3 @@
-// @flow
-
 import React, { useEffect } from 'react';
 import Link from 'next/link';
 import hljs from 'highlight.js/lib/highlight';
@@ -8,12 +6,12 @@ import ReactMarkdown from 'react-markdown';
 import useAuth from '../../hooks/useAuth';
 import DateBadge from '../shared/DateBadge';
 
-import type { FormState, PostType } from '../../types/posts';
+import { FormState, PostType } from '../../types/posts';
 
 const ROUTE = '/posts';
 
-type Props = {
-  post: PostType | FormState,
+interface Props {
+  post: PostType & FormState,
   postId?: string,
   editLink?: boolean,
   summary?: boolean
@@ -59,7 +57,6 @@ const PostArticle = (props: Props) => {
   }, []);
 
   const user = useAuth();
-
   const body = summary ? getSummary(post.body) : post.body;
 
   return (
