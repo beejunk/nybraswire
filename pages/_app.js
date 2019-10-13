@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import App, { Container } from 'next/app';
+import App from 'next/app';
 import firebase from '../firebase';
 import ThemeContext from '../theme';
 import theme from '../theme/nybraswire';
@@ -134,18 +134,16 @@ class MyApp extends App {
     const { postIds, postsById, currentPageIds } = this.state;
 
     return (
-      <Container>
-        <ThemeContext.Provider value={{ ...theme, ...this.themeSettings }}>
-          <Component
-            {...pageProps}
-            currentPageIds={currentPageIds}
-            postCache={{ postIds, postsById }}
-            addPostsToCache={this.addPostsToCache}
-            getNextPage={this.getNextPage}
-            getPrevPage={this.getPrevPage}
-          />
-        </ThemeContext.Provider>
-      </Container>
+      <ThemeContext.Provider value={{ ...theme, ...this.themeSettings }}>
+        <Component
+          {...pageProps}
+          currentPageIds={currentPageIds}
+          postCache={{ postIds, postsById }}
+          addPostsToCache={this.addPostsToCache}
+          getNextPage={this.getNextPage}
+          getPrevPage={this.getPrevPage}
+        />
+      </ThemeContext.Provider>
     );
   }
 }
