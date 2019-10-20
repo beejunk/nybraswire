@@ -1,4 +1,5 @@
 import React from 'react';
+import { NextPage } from 'next';
 import { Col, Row } from 'reactstrap';
 import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
 
@@ -14,7 +15,7 @@ const uiConfig = {
   credentialHelper: 'none',
 };
 
-const Login: React.FC = () => {
+const Login: NextPage = () => {
   const user = useAuth();
 
   return (

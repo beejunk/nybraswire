@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button, Col, Row } from 'reactstrap';
+import { NextPage } from 'next';
+
 import Layout from '../components/shared/Layout';
 import PostArticle from '../components/posts/PostArticle';
-
 import { PostCacheType } from '../types/posts';
 
 const PAGE_TITLE = 'Recent Posts';
@@ -38,7 +39,7 @@ const hasPrevPage = (currentPageIds: string[], postIds: string[]): boolean => {
   return result;
 };
 
-const Index: React.FC<Props> = ({
+const Index: NextPage<Props> = ({
   currentPageIds,
   getNextPage,
   getPrevPage,

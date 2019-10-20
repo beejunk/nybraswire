@@ -325,8 +325,10 @@ Posts.getInitialProps = async (context): Promise<Props> => {
   return {
     post,
     postId: (id as string),
-    create: create === 'true',
-    edit: edit === 'true',
+    // This is ugly but the ParsedUrlQuery type doesn't seem to think query
+    // params can be parsed into booleans
+    create: Boolean(create),
+    edit: Boolean(edit),
   };
 };
 
