@@ -1,8 +1,7 @@
-// @flow
-
 import React from 'react';
 import { Col, Row } from 'reactstrap';
 import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
+
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 import useAuth from '../hooks/useAuth';
@@ -10,12 +9,12 @@ import useAuth from '../hooks/useAuth';
 const uiConfig = {
   signInOptions: [firebase.auth.EmailAuthProvider.PROVIDER_ID],
   callBacks: {
-    signInSuccessWithAuthResult: () => false,
+    signInSuccessWithAuthResult: (): boolean => false,
   },
   credentialHelper: 'none',
 };
 
-const Login = () => {
+const Login: React.FC = () => {
   const user = useAuth();
 
   return (

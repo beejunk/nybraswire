@@ -3,4 +3,5 @@ import './sass/theme.scss';
 
 export default {
   colors,
+  header: '',
 };

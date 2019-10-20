@@ -6,14 +6,14 @@ import useAuth from '../../hooks/useAuth';
 
 import { FormState, PostType } from '../../types/posts';
 
-interface Props {
-  form: FormState & PostType,
-  preview: boolean,
-  togglePreview: (boolean) => void,
-  children: any,
+type Props = {
+  form: FormState | PostType;
+  preview: boolean;
+  togglePreview: (boolean) => void;
+  children: React.ReactNode;
 };
 
-const PostEditPage = ({
+const PostEditPage: React.FC<Props> = ({
   form,
   preview,
   togglePreview,

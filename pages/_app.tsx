@@ -1,15 +1,14 @@
-// @flow
-
 import React from 'react';
 import App from 'next/app';
+
 import firebase from '../firebase';
 import ThemeContext from '../theme';
 import theme from '../theme/nybraswire';
-import type { PostType } from '../types/posts';
+import { PostType, PostCacheType } from '../types/posts';
 
 const POSTS_PER_PAGE = 5;
 
-const getInitialPage = async () => {
+const getInitialPage = async (): Promise<PostCacheType> => {
   const firestore = firebase.firestore();
   const postCollection = firestore.collection('posts');
   const postIds = [];
@@ -30,15 +29,21 @@ const getInitialPage = async () => {
 };
 
 type State = {
-  postIds: string[],
-  postsById: { [id: string]: PostType },
-  currentPageIds: string[],
+  postIds: string[];
+  postsById: { [id: string]: PostType };
+  currentPageIds: string[];
+};
+
+type ThemeSettings = {
+  header: string;
 };
 
 class MyApp extends App {
   state: State;
 
-  constructor(props: any) {
+  themeSettings: ThemeSettings;
+
+  constructor(props) {
     super(props);
 
     // NOTE: Theme settings are intended to be fetched only once on initial
@@ -51,9 +56,13 @@ class MyApp extends App {
     };
   }
 
-  static async getInitialProps({ Component, ctx }: any) {
+  static async getInitialProps({ Component, ctx }): Promise<{
+    pageProps: any;
+    themeSettings: ThemeSettings;
+    initialPage: PostCacheType;
+  }> {
     let pageProps = {};
-    let initialPage = {};
+    let initialPage = { postIds: [], postsById: {} };
     let themeSettings;
 
     if (Component.getInitialProps) {
@@ -71,7 +80,7 @@ class MyApp extends App {
     return { pageProps, themeSettings, initialPage };
   }
 
-  addPostsToCache = async () => {
+  addPostsToCache = async (): Promise<void> => {
     const { currentPageIds } = this.state;
     const firestore = firebase.firestore();
     const postCollection = firestore.collection('posts');
@@ -93,13 +102,13 @@ class MyApp extends App {
       newPostsById[doc.id] = doc.data();
     });
 
-    this.setState(prevState => ({
+    this.setState((prevState: State) => ({
       postIds: [...prevState.postIds, ...newPostIds],
       postsById: { ...prevState.postsById, ...newPostsById },
     }));
   }
 
-  getNextPage = () => {
+  getNextPage = (): void => {
     const { currentPageIds, postIds } = this.state;
     const lastPostId = currentPageIds[currentPageIds.length - 1];
     const lastPostIndex = postIds.indexOf(lastPostId);
@@ -110,7 +119,7 @@ class MyApp extends App {
     this.setState({ currentPageIds: nextPageIds });
   }
 
-  getPrevPage = () => {
+  getPrevPage = (): void => {
     const { currentPageIds, postIds } = this.state;
     const firstPostIndex = postIds.indexOf(currentPageIds[0]);
     const prevPageIds = postIds.slice(firstPostIndex - POSTS_PER_PAGE, firstPostIndex);
@@ -118,7 +127,7 @@ class MyApp extends App {
     this.setState({ currentPageIds: prevPageIds });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(): void {
     const { currentPageIds, postIds } = this.state;
     const lastPageIndex = postIds.indexOf(currentPageIds[currentPageIds.length - 1]);
     const pageIsFull = currentPageIds.length === POSTS_PER_PAGE;
@@ -129,7 +138,7 @@ class MyApp extends App {
     }
   }
 
-  render() {
+  render(): React.ReactElement {
     const { Component, pageProps } = this.props;
     const { postIds, postsById, currentPageIds } = this.state;
 

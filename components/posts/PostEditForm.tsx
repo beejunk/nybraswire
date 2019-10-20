@@ -11,29 +11,29 @@ import {
 
 import { FormState } from '../../types/posts';
 
-interface Props {
-  form: FormState,
-  disableSubmit: boolean,
-  updateForm: (form: FormState) => void,
-  submit: () => void,
-};
+type Props = {
+  form: FormState;
+  disableSubmit: boolean;
+  updateForm: (form: FormState) => void;
+  submit: () => void;
+}
 
-const PostEditForm = ({
+const PostEditForm: React.FC<Props> = ({
   disableSubmit,
   form,
   updateForm,
   submit,
 }: Props) => {
-  const handlePostChange = (field: string) => (ev: React.KeyboardEvent<HTMLInputElement>) => {
+  const handlePostChange = (field: string) => (ev: React.ChangeEvent<HTMLInputElement>): void => {
     updateForm({ ...form, [field]: ev.currentTarget.value });
   };
 
-  const handleDateChange = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleDateChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
     const postedOnDate = ev.currentTarget.value;
     updateForm({ ...form, postedOnDate });
   };
 
-  const handleTimeChange = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleTimeChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
     const postedOnTime = ev.currentTarget.value;
     updateForm({ ...form, postedOnTime });
   };

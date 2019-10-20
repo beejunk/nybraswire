@@ -1,12 +1,17 @@
 import React, { useContext } from 'react';
-import { getMonthStr, appendSuffixToDate, getFormattedTime } from '../../../utils/dateUtils';
+
+import {
+  getMonthStr,
+  appendSuffixToDate,
+  getFormattedTime,
+} from '../../../utils/dateUtils';
 import ThemeContext from '../../../theme';
 
-interface Props {
-  timestamp: number,
+type Props = {
+  timestamp: number;
 };
 
-const DateBadge = (props: Props) => {
+const DateBadge: React.FunctionComponent<Props> = (props) => {
   const { timestamp } = props;
   const { colors } = useContext(ThemeContext);
   const date = new Date(timestamp);

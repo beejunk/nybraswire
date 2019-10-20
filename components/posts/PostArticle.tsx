@@ -10,14 +10,14 @@ import { FormState, PostType } from '../../types/posts';
 
 const ROUTE = '/posts';
 
-interface Props {
-  post: PostType & FormState,
-  postId?: string,
-  editLink?: boolean,
-  summary?: boolean
+type Props = {
+  post: PostType | FormState;
+  postId?: string;
+  editLink?: boolean;
+  summary?: boolean;
 };
 
-const appendEllipses = (body: string) => {
+const appendEllipses = (body: string): string => {
   if (body.endsWith('.')) {
     return body;
   }
@@ -27,7 +27,7 @@ const appendEllipses = (body: string) => {
   return `${body.slice(0, lastSpace)} ...`;
 };
 
-const getSummary = (body: string, maxLength: number = 600) => {
+const getSummary = (body: string, maxLength = 600): string => {
   if (body.length > maxLength) {
     const truncatedBody = body.slice(0, maxLength);
     return appendEllipses(truncatedBody);
@@ -36,7 +36,7 @@ const getSummary = (body: string, maxLength: number = 600) => {
   return body;
 };
 
-const PostArticle = (props: Props) => {
+const PostArticle: React.FC<Props> = (props) => {
   const {
     post,
     postId,
@@ -51,7 +51,7 @@ const PostArticle = (props: Props) => {
     // called once. This is not the case with client-side routing in a Next.js
     // app, where content may be dynamically loaded on a single-page. So we
     // need to set the `called` flag to `false` during component clean-up.
-    return () => {
+    return (): void => {
       hljs.initHighlighting.called = false;
     };
   }, []);
@@ -63,7 +63,7 @@ const PostArticle = (props: Props) => {
     <article className="PostArticle">
       <Row className="border-bottom mb-3 align-items-center">
         <Col xs={12} sm={10} className="mb-3" css={{ display: 'flex', alignItems: 'center' }}>
-          <DateBadge timestamp={post.postedOn || Date.now()} />
+          <DateBadge timestamp={(post as PostType).postedOn || Date.now()} />
 
           {postId && summary ? (
             <h2 className="ml-3">

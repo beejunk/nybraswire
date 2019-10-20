@@ -1,8 +1,8 @@
-// @flow
-
 import React, { useReducer, useEffect } from 'react';
 import Router from 'next/router';
+import { NextPage } from 'next';
 import { Alert } from 'reactstrap';
+
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
 import PostEditPage from '../components/posts/PostEditPage';
@@ -10,7 +10,7 @@ import PostArticle from '../components/posts/PostArticle';
 import PostEditForm from '../components/posts/PostEditForm';
 import { getLocalDate, getLocalTime } from '../utils/dateUtils';
 
-import type {
+import {
   AlertState, FormState, PostType, PostCacheType,
 } from '../types/posts';
 
@@ -27,10 +27,10 @@ const SET_SHOULD_CLEAR_FORM = 'SET_SHOULD_CLEAR_FORM';
 // Action and dispatch types
 // -------------------------
 
-type UpdateAlertAction = { type: 'UPDATE_ALERT', alert: AlertState };
-type UpdateFormAction = { type: 'UPDATE_FORM', form: FormState };
+type UpdateAlertAction = { type: 'UPDATE_ALERT'; alert: AlertState };
+type UpdateFormAction = { type: 'UPDATE_FORM'; form: FormState };
 type TogglePreviewAction = { type: 'TOGGLE_PREVIEW' };
-type SetShouldClearFormAction = { type: 'SET_SHOULD_CLEAR_FORM', shouldClearForm: boolean };
+type SetShouldClearFormAction = { type: 'SET_SHOULD_CLEAR_FORM'; shouldClearForm: boolean };
 
 type Action =
   | UpdateAlertAction
@@ -45,18 +45,18 @@ type Dispatch = (action: Action) => void;
 // --------------------------------
 
 export type Props = {
-  +post?: PostType,
-  +postCache: PostCacheType,
-  +postId?: string,
-  +edit: boolean,
-  +create: boolean,
+  post?: PostType;
+  postCache?: PostCacheType;
+  postId?: string;
+  edit: boolean;
+  create: boolean;
 };
 
 export type State = {
-  +alert: AlertState,
-  +form: FormState,
-  +shouldClearForm: boolean,
-  +preview: boolean,
+  alert: AlertState;
+  form: FormState;
+  shouldClearForm: boolean;
+  preview: boolean;
 };
 
 
@@ -83,24 +83,34 @@ const setShouldClearForm = (shouldClearForm: boolean): SetShouldClearFormAction 
   shouldClearForm,
 });
 
-const generateActions = (dispatch: Dispatch) => ({
-  updateAlert(alert: AlertState) {
+interface PostActionsAPI {
+  updateAlert(alert: AlertState): void;
+  updateForm(form: FormState): void;
+  togglePreview(): void;
+  setShouldClearForm(shouldClearForm: boolean): void;
+  createPost(form: FormState): Promise<void>;
+  updatePost(form: FormState, post: PostType, postId: string): Promise<void>;
+  submit(form: FormState, post?: PostType, postId?: string): void;
+}
+
+const generateActions = (dispatch: Dispatch): PostActionsAPI => ({
+  updateAlert(alert: AlertState): void {
     dispatch(updateAlert(alert));
   },
 
-  updateForm(form: FormState) {
+  updateForm(form: FormState): void {
     dispatch(updateForm(form));
   },
 
-  togglePreview() {
+  togglePreview(): void {
     dispatch(togglePreview());
   },
 
-  setShouldClearForm(shouldClearForm: boolean) {
+  setShouldClearForm(shouldClearForm: boolean): void {
     dispatch(setShouldClearForm(shouldClearForm));
   },
 
-  async createPost(form: FormState) {
+  async createPost(form: FormState): Promise<void> {
     const firestore = firebase.firestore();
     const ref = firestore.collection('posts');
     const postedOn = new Date(`${form.postedOnDate}T${form.postedOnTime}`).getTime();
@@ -123,11 +133,11 @@ const generateActions = (dispatch: Dispatch) => ({
     }
   },
 
-  async updatePost(form: FormState, post: PostType, postId: string) {
+  async updatePost(form: FormState, post: PostType, postId: string): Promise<void> {
     const firestore = firebase.firestore();
     const ref = firestore.collection('posts').doc(postId);
     const postedOn = new Date(`${form.postedOnDate}T${form.postedOnTime}`).getTime();
-    const updatedPost = {};
+    const updatedPost = { ...post };
 
     updatedPost.updatedOn = Date.now();
 
@@ -154,7 +164,7 @@ const generateActions = (dispatch: Dispatch) => ({
     }
   },
 
-  submit(form: FormState, post?: PostType, postId?: string) {
+  submit(form: FormState, post?: PostType, postId?: string): void {
     if (post && postId) {
       this.updatePost(form, post, postId);
     } else {
@@ -182,7 +192,7 @@ const reducer = (state: State, action: Action): State => {
 // Helper functions.
 // -----------------
 
-const validateContent = (form: FormState, post?: PostType) => {
+const validateContent = (form: FormState, post?: PostType): boolean => {
   const contentHasChanged = post
     ? (form.title !== post.title) || (form.body !== post.body)
     : true;
@@ -191,14 +201,14 @@ const validateContent = (form: FormState, post?: PostType) => {
   return contentHasChanged && contentIsNotEmpty;
 };
 
-const getFormStateFromPost = (post: PostType) => ({
+const getFormStateFromPost = (post: PostType): FormState => ({
   title: post.title,
   body: post.body,
   postedOnDate: getLocalDate(post.postedOn),
   postedOnTime: getLocalTime(post.postedOn),
 });
 
-const getDefaultFormState = () => {
+const getDefaultFormState = (): FormState => {
   const now = Date.now();
 
   return {
@@ -213,7 +223,7 @@ const getDefaultFormState = () => {
 // Component
 // ---------
 
-const Posts = (props: Props) => {
+const Posts: NextPage<Props> = (props) => {
   const {
     postCache,
     post,
@@ -258,7 +268,7 @@ const Posts = (props: Props) => {
     <Layout title={activePost && !edit ? activePost.title : 'Create/Edit Post'}>
       <Alert
         isOpen={state.alert.show}
-        toggle={() => { actions.updateAlert({ ...state.alert, show: false }); }}
+        toggle={(): void => { actions.updateAlert({ ...state.alert, show: false }); }}
         color={state.alert.color}
       >
         {state.alert.message}
@@ -272,7 +282,7 @@ const Posts = (props: Props) => {
         >
           <PostEditForm
             form={state.form}
-            submit={() => { actions.submit(state.form, activePost, postId); }}
+            submit={(): void => { actions.submit(state.form, activePost, postId); }}
             disableSubmit={!validateContent(state.form, activePost)}
             updateForm={actions.updateForm}
           />
@@ -295,13 +305,17 @@ const Posts = (props: Props) => {
 
 Posts.defaultProps = { post: undefined, postId: undefined };
 
-Posts.getInitialProps = async (context) => {
+Posts.getInitialProps = async (context): Promise<Props> => {
   const { req, query } = context;
   const { id, edit, create } = query;
   let post;
 
   if (id && req) {
-    const postRequest = await firebase.firestore().collection('posts').doc(id).get();
+    const postRequest = await firebase
+      .firestore()
+      .collection('posts')
+      .doc((id as string))
+      .get();
 
     if (postRequest.exists) {
       post = { ...postRequest.data() };
@@ -310,9 +324,9 @@ Posts.getInitialProps = async (context) => {
 
   return {
     post,
-    postId: id,
-    create,
-    edit,
+    postId: (id as string),
+    create: create === 'true',
+    edit: edit === 'true',
   };
 };
 

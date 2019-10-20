@@ -1,5 +1,5 @@
 module.exports = {
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   env: {
     browser: true,
     es6: true,
@@ -9,6 +9,8 @@ module.exports = {
   extends: [
     'airbnb',
     'plugin:flowtype/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/typescript'
   ],
   globals: {
     Atomics: 'readonly',
@@ -25,9 +27,11 @@ module.exports = {
     'react',
     'react-hooks',
     'flowtype',
+    '@typescript-eslint'
   ],
   rules: {
     'react/jsx-filename-extension': 0,
+    'react/prop-types': 0,
     'react/react-in-jsx-scope': 0,
     'jsx-a11y/anchor-is-valid': 0,
   },

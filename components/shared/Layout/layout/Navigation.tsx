@@ -1,5 +1,3 @@
-// @flow
-
 import React, { useState } from 'react';
 import Link from 'next/link';
 import {
@@ -15,11 +13,11 @@ import {
 import firebase from '../../../../firebase';
 import useAuth from '../../../../hooks/useAuth';
 
-const logout = () => {
+const logout = (): void => {
   firebase.auth().signOut();
 };
 
-const Navigation = () => {
+const Navigation: React.FC = () => {
   const user = useAuth();
   const [open, setMenuState] = useState(false);
 
@@ -32,7 +30,7 @@ const Navigation = () => {
       className="mb-5"
     >
       <NavbarBrand
-        tag={props => (
+        tag={(props): React.ReactElement => (
           <Link href="/">
             <a {...props}>
               Nybraswire ::
@@ -47,13 +45,13 @@ const Navigation = () => {
 
       {user && (
         <>
-          <NavbarToggler onClick={() => { setMenuState(!open); }} />
+          <NavbarToggler onClick={(): void => { setMenuState(!open); }} />
 
           <Collapse isOpen={open} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem className="mr-3">
                 <NavLink
-                  tag={props => (
+                  tag={(props): React.ReactElement => (
                     <Link as="/posts/create" href="/posts?create=true">
                       <a {...props}>
                         Create Post
