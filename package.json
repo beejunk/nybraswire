@@ -7,10 +7,10 @@
     "node": "^10.13.0"
   },
   "scripts": {
-    "dev": "node --inspect server",
+    "dev": "node --inspect node_modules/.bin/next",
     "build": "next build",
     "lint": "npx tsc --noEmit && npx eslint '*/**/*.{js,ts,tsx}'",
-    "start": "NODE_ENV=production node server",
+    "start": "next start",
     "test": "jest",
     "test:debug": "node --inspect-brk node_modules/.bin/jest --watch --runInBand"
   },
