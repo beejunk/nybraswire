@@ -8,7 +8,6 @@ module.exports = {
   },
   extends: [
     'airbnb',
-    'plugin:flowtype/recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:import/typescript'
   ],
@@ -26,7 +25,6 @@ module.exports = {
   plugins: [
     'react',
     'react-hooks',
-    'flowtype',
     '@typescript-eslint'
   ],
   rules: {
