@@ -18,7 +18,7 @@ const PostEditPage: React.FC<Props> = ({
   preview,
   togglePreview,
   children,
-}: Props) => {
+}) => {
   const user = useAuth();
 
   return (

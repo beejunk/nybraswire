@@ -2,16 +2,17 @@ import React from 'react';
 import { NextPage } from 'next';
 import { Alert } from 'reactstrap';
 
-import Layout from '../../../components/shared/Layout';
-import firebase from '../../../firebase';
-import PostEditPage from '../../../components/posts/PostEditPage';
-import PostEditForm from '../../../components/posts/PostEditForm';
-import { getLocalDate, getLocalTime } from '../../../utils/dateUtils';
-import usePostEditActions from '../../../hooks/usePostEditActions';
+import Layout from '../../components/shared/Layout';
+import firebase from '../../firebase';
+import PostEditPage from '../../components/posts/PostEditPage';
+import PostEditForm from '../../components/posts/PostEditForm';
+import { getLocalDate, getLocalTime } from '../../utils/dateUtils';
+import usePostEditActions from '../../hooks/usePostEditActions';
+
 import {
   FormState,
   PostType,
-} from '../../../types/posts';
+} from '../../types/posts';
 
 type Props = {
   post?: PostType;
@@ -31,13 +32,6 @@ const validateContent = (form: FormState, post?: PostType): boolean => {
   return contentHasChanged && contentIsNotEmpty;
 };
 
-const getFormStateFromPost = (post: PostType): FormState => ({
-  title: post.title,
-  body: post.body,
-  postedOnDate: getLocalDate(post.postedOn),
-  postedOnTime: getLocalTime(post.postedOn),
-});
-
 const getDefaultFormState = (): FormState => {
   const now = Date.now();
 
@@ -53,16 +47,14 @@ const getDefaultFormState = (): FormState => {
 // Component
 // ---------
 
-const Edit: NextPage<Props> = (props) => {
+const Create: NextPage<Props> = (props) => {
   const {
     post,
     postId,
   } = props;
   const initialState = {
     alert: { color: 'success', message: '', show: false },
-    form: post
-      ? getFormStateFromPost(post)
-      : getDefaultFormState(),
+    form: getDefaultFormState(),
     preview: false,
   };
 
@@ -101,7 +93,7 @@ const Edit: NextPage<Props> = (props) => {
   );
 };
 
-Edit.getInitialProps = async (context): Promise<Props> => {
+Create.getInitialProps = async (context): Promise<Props> => {
   const { req, query } = context;
   const { postId } = query;
   let post;
@@ -124,4 +116,4 @@ Edit.getInitialProps = async (context): Promise<Props> => {
   };
 };
 
-export default Edit;
+export default Create;
