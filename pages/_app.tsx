@@ -3,6 +3,7 @@ import App from 'next/app';
 
 import firebase from '../firebase';
 import ThemeContext from '../theme';
+import PostCacheContext from '../utils/PostCacheContext';
 import theme from '../theme/nybraswire';
 import { PostType, PostCacheType } from '../types/posts';
 
@@ -57,7 +58,7 @@ class MyApp extends App {
   }
 
   static async getInitialProps({ Component, ctx }): Promise<{
-    pageProps: any;
+    pageProps: any; // eslint-disable-line
     themeSettings: ThemeSettings;
     initialPage: PostCacheType;
   }> {
@@ -142,16 +143,20 @@ class MyApp extends App {
     const { Component, pageProps } = this.props;
     const { postIds, postsById, currentPageIds } = this.state;
 
+    const postCache = {
+      currentPageIds,
+      postIds,
+      postsById,
+      addPostsToCache: this.addPostsToCache,
+      getNextPage: this.getNextPage,
+      getPrevPage: this.getPrevPage,
+    };
+
     return (
       <ThemeContext.Provider value={{ ...theme, ...this.themeSettings }}>
-        <Component
-          {...pageProps}
-          currentPageIds={currentPageIds}
-          postCache={{ postIds, postsById }}
-          addPostsToCache={this.addPostsToCache}
-          getNextPage={this.getNextPage}
-          getPrevPage={this.getPrevPage}
-        />
+        <PostCacheContext.Provider value={postCache}>
+          <Component {...pageProps} />
+        </PostCacheContext.Provider>
       </ThemeContext.Provider>
     );
   }

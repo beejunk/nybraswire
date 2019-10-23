@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { NextPage } from 'next';
 import { Alert } from 'reactstrap';
 
@@ -8,6 +8,7 @@ import PostEditPage from '../../../components/posts/PostEditPage';
 import PostEditForm from '../../../components/posts/PostEditForm';
 import { getLocalDate, getLocalTime } from '../../../utils/dateUtils';
 import usePostEditActions from '../../../hooks/usePostEditActions';
+import PostCacheContext from '../../../utils/PostCacheContext';
 import {
   FormState,
   PostType,
@@ -38,17 +39,6 @@ const getFormStateFromPost = (post: PostType): FormState => ({
   postedOnTime: getLocalTime(post.postedOn),
 });
 
-const getDefaultFormState = (): FormState => {
-  const now = Date.now();
-
-  return {
-    title: '',
-    body: '',
-    postedOnDate: getLocalDate(now),
-    postedOnTime: getLocalTime(now),
-  };
-};
-
 // ---------
 // Component
 // ---------
@@ -58,11 +48,12 @@ const Edit: NextPage<Props> = (props) => {
     post,
     postId,
   } = props;
+  const postCache = useContext(PostCacheContext);
+  const activePost = post || postCache.postsById[postId];
+
   const initialState = {
     alert: { color: 'success', message: '', show: false },
-    form: post
-      ? getFormStateFromPost(post)
-      : getDefaultFormState(),
+    form: activePost && getFormStateFromPost(activePost),
     preview: false,
   };
 
@@ -78,7 +69,7 @@ const Edit: NextPage<Props> = (props) => {
         {postEditState.alert.message}
       </Alert>
 
-      {post ? (
+      {activePost ? (
         <PostEditPage
           form={postEditState.form}
           togglePreview={postActions.togglePreview}
@@ -86,8 +77,8 @@ const Edit: NextPage<Props> = (props) => {
         >
           <PostEditForm
             form={postEditState.form}
-            submit={(): void => { postActions.submit(postEditState.form, post, postId); }}
-            disableSubmit={!validateContent(postEditState.form, post)}
+            submit={(): void => { postActions.submit(postEditState.form, activePost, postId); }}
+            disableSubmit={!validateContent(postEditState.form, activePost)}
             updateForm={postActions.updateForm}
           />
         </PostEditPage>

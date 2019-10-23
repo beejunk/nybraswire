@@ -67,7 +67,7 @@ const PostArticle: React.FC<Props> = (props) => {
 
           {postId && summary ? (
             <h2 className="ml-3">
-              <Link href={`${ROUTE}/${postId}`}>
+              <Link href={`${ROUTE}/[postId]`} as={`${ROUTE}/${postId}`}>
                 <a>{post.title}</a>
               </Link>
             </h2>
@@ -80,7 +80,7 @@ const PostArticle: React.FC<Props> = (props) => {
 
         {user && editLink && postId && (
           <Col xs={12} sm={2} className="text-right">
-            <Link href={`${ROUTE}/${postId}/edit`}>
+            <Link href={`${ROUTE}/[postId]/edit`} as={`${ROUTE}/${postId}/edit`}>
               <a>
                 Edit
               </a>

@@ -1,19 +1,12 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button, Col, Row } from 'reactstrap';
 import { NextPage } from 'next';
 
 import Layout from '../components/shared/Layout';
 import PostArticle from '../components/posts/PostArticle';
-import { PostCacheType } from '../types/posts';
+import PostCacheContext from '../utils/PostCacheContext';
 
 const PAGE_TITLE = 'Recent Posts';
-
-type Props = {
-  currentPageIds: string[];
-  getNextPage(): void;
-  getPrevPage(): void;
-  postCache: PostCacheType;
-};
 
 const hasNextPage = (currentPageIds: string[], postIds: string[]): boolean => {
   let result = false;
@@ -39,40 +32,39 @@ const hasPrevPage = (currentPageIds: string[], postIds: string[]): boolean => {
   return result;
 };
 
-const Index: NextPage<Props> = ({
-  currentPageIds,
-  getNextPage,
-  getPrevPage,
-  postCache,
-}) => (
-  <Layout title={PAGE_TITLE}>
-    {currentPageIds.map(id => (
-      <PostArticle
-        key={id}
-        post={postCache.postsById[id]}
-        postId={id}
-        summary
-      />
-    ))}
+const Index: NextPage = () => {
+  const postCache = useContext(PostCacheContext);
 
-    <Row>
-      {hasPrevPage(currentPageIds, postCache.postIds) && (
-        <Col xs={4} sm={3} md={2}>
-          <Button onClick={getPrevPage} block>
-            Previous
-          </Button>
-        </Col>
-      )}
+  return (
+    <Layout title={PAGE_TITLE}>
+      {postCache.currentPageIds.map(id => (
+        <PostArticle
+          key={id}
+          post={postCache.postsById[id]}
+          postId={id}
+          summary
+        />
+      ))}
 
-      {hasNextPage(currentPageIds, postCache.postIds) && (
-        <Col xs={4} sm={3} md={2}>
-          <Button onClick={getNextPage} block>
-            Next
-          </Button>
-        </Col>
-      )}
-    </Row>
-  </Layout>
-);
+      <Row>
+        {hasPrevPage(postCache.currentPageIds, postCache.postIds) && (
+          <Col xs={4} sm={3} md={2}>
+            <Button onClick={postCache.getPrevPage} block>
+              Previous
+            </Button>
+          </Col>
+        )}
+
+        {hasNextPage(postCache.currentPageIds, postCache.postIds) && (
+          <Col xs={4} sm={3} md={2}>
+            <Button onClick={postCache.getNextPage} block>
+              Next
+            </Button>
+          </Col>
+        )}
+      </Row>
+    </Layout>
+  );
+};
 
 export default Index;

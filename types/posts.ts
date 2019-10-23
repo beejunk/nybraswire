@@ -24,3 +24,12 @@ export interface PostCacheType {
   postIds: string[];
   postsById: { [id: string]: PostType };
 }
+
+export interface PostCacheAPI {
+  currentPageIds: string[];
+  postIds: string[];
+  postsById: { [id: string]: PostType };
+  addPostsToCache(): void;
+  getNextPage(): void;
+  getPrevPage(): void;
+}
