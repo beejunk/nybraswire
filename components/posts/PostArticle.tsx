@@ -98,7 +98,7 @@ const PostArticle: React.FC<Props> = (props) => {
       {summary && postId && (
         <Row>
           <Col className="text-right">
-            <Link href={`${ROUTE}/${postId}`}>
+            <Link href={`${ROUTE}/[postId]`} as={`${ROUTE}/${postId}`}>
               <a><small>Read more &gt;</small></a>
             </Link>
           </Col>
