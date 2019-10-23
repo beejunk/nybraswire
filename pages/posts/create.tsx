@@ -3,33 +3,20 @@ import { NextPage } from 'next';
 import { Alert } from 'reactstrap';
 
 import Layout from '../../components/shared/Layout';
-import firebase from '../../firebase';
 import PostEditPage from '../../components/posts/PostEditPage';
 import PostEditForm from '../../components/posts/PostEditForm';
 import { getLocalDate, getLocalTime } from '../../utils/dateUtils';
 import usePostEditActions from '../../hooks/usePostEditActions';
 
-import {
-  FormState,
-  PostType,
-} from '../../types/posts';
-
-type Props = {
-  post?: PostType;
-  postId?: string;
-};
+import { FormState } from '../../types/posts';
 
 // -----------------
 // Helper functions.
 // -----------------
 
-const validateContent = (form: FormState, post?: PostType): boolean => {
-  const contentHasChanged = post
-    ? (form.title !== post.title) || (form.body !== post.body)
-    : true;
+const validateContent = (form: FormState): boolean => {
   const contentIsNotEmpty = (form.title !== '') && (form.body !== '');
-
-  return contentHasChanged && contentIsNotEmpty;
+  return contentIsNotEmpty;
 };
 
 const getDefaultFormState = (): FormState => {
@@ -43,15 +30,7 @@ const getDefaultFormState = (): FormState => {
   };
 };
 
-// ---------
-// Component
-// ---------
-
-const Create: NextPage<Props> = (props) => {
-  const {
-    post,
-    postId,
-  } = props;
+const Create: NextPage = () => {
   const initialState = {
     alert: { color: 'success', message: '', show: false },
     form: getDefaultFormState(),
@@ -70,50 +49,20 @@ const Create: NextPage<Props> = (props) => {
         {postEditState.alert.message}
       </Alert>
 
-      {post ? (
-        <PostEditPage
+      <PostEditPage
+        form={postEditState.form}
+        togglePreview={postActions.togglePreview}
+        preview={postEditState.preview}
+      >
+        <PostEditForm
           form={postEditState.form}
-          togglePreview={postActions.togglePreview}
-          preview={postEditState.preview}
-        >
-          <PostEditForm
-            form={postEditState.form}
-            submit={(): void => { postActions.submit(postEditState.form, post, postId); }}
-            disableSubmit={!validateContent(postEditState.form, post)}
-            updateForm={postActions.updateForm}
-          />
-        </PostEditPage>
-      ) : (
-        <p>
-          {/* TODO: Create proper post-does-not-exist page */}
-          What are you trying to do?
-        </p>
-      )}
+          submit={(): void => { postActions.submit(postEditState.form); }}
+          disableSubmit={!validateContent(postEditState.form)}
+          updateForm={postActions.updateForm}
+        />
+      </PostEditPage>
     </Layout>
   );
-};
-
-Create.getInitialProps = async (context): Promise<Props> => {
-  const { req, query } = context;
-  const { postId } = query;
-  let post;
-
-  if (postId && req) {
-    const postRequest = await firebase
-      .firestore()
-      .collection('posts')
-      .doc((postId as string))
-      .get();
-
-    if (postRequest.exists) {
-      post = { ...postRequest.data() };
-    }
-  }
-
-  return {
-    post,
-    postId: (postId as string),
-  };
 };
 
 export default Create;
