@@ -60,17 +60,17 @@ const PostArticle: React.FC<Props> = (props) => {
   const body = summary ? getSummary(post.body) : post.body;
 
   return (
-    <article className="PostArticle">
+    <article className="PostArticle mb-5">
       <Row className="border-bottom mb-3 align-items-center">
         <Col xs={12} sm={10} className="mb-3" css={{ display: 'flex', alignItems: 'center' }}>
           <DateBadge timestamp={(post as PostType).postedOn || Date.now()} />
 
           {postId && summary ? (
-            <h2 className="ml-3">
+            <h1 className="ml-3">
               <Link href={`${ROUTE}/[postId]`} as={`${ROUTE}/${postId}`}>
                 <a>{post.title}</a>
               </Link>
-            </h2>
+            </h1>
           ) : (
             <h1 className="ml-3">
               {post.title}
