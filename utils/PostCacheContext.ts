@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 
-import { PostCacheAPI } from '../types/posts';
+import { PostCacheType } from '../types/posts';
 
-const PostCacheContext = createContext<PostCacheAPI>(null);
+const PostCacheContext = createContext<PostCacheType>(null);
 
 export default PostCacheContext;

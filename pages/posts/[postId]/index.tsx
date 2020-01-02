@@ -1,11 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { NextPage } from 'next';
 import { Alert } from 'reactstrap';
 
 import Layout from '../../../components/shared/Layout';
 import firebase from '../../../firebase';
 import PostArticle from '../../../components/posts/PostArticle';
-import PostCacheContext from '../../../utils/PostCacheContext';
 
 import {
   AlertState,
@@ -27,9 +26,7 @@ const Posts: NextPage<Props> = (props) => {
     postId,
   } = props;
 
-  const postCache = useContext(PostCacheContext);
-  const activePost = post || postCache.postsById[postId];
-  const title = activePost ? activePost.title : 'No Post Found';
+  const title = post ? post.title : 'No Post Found';
   const initialAlertState: AlertState = {
     color: 'success',
     message: '',
@@ -48,8 +45,8 @@ const Posts: NextPage<Props> = (props) => {
         {alert.message}
       </Alert>
 
-      {activePost ? (
-        <PostArticle post={activePost} postId={postId} editLink />
+      {post ? (
+        <PostArticle post={post} postId={postId} editLink />
       ) : (
         <p>
           {/* TODO: Create proper post-does-not-exist page */}
@@ -61,11 +58,11 @@ const Posts: NextPage<Props> = (props) => {
 };
 
 Posts.getInitialProps = async (context): Promise<Props> => {
-  const { req, query } = context;
+  const { query } = context;
   const { postId } = query;
   let post;
 
-  if (postId && req) {
+  if (postId) {
     const postRequest = await firebase
       .firestore()
       .collection('posts')
