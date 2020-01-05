@@ -7,11 +7,15 @@ import Layout from '../components/shared/Layout';
 import PostArticle from '../components/posts/PostArticle';
 import PostCacheContext from '../utils/PostCacheContext';
 import ThemeContext from '../theme';
-import { PostType, PostCacheType } from '../types/posts';
+import { PostCacheType } from '../types/posts';
+
+const DEFAULT_STATE = {
+  postCache: { postsById: {}, postIds: [] },
+  currentPageIds: [],
+};
 
 type State = {
-  postIds: string[];
-  postsById: { [id: string]: PostType };
+  postCache: PostCacheType;
   currentPageIds: string[];
 };
 
@@ -31,7 +35,7 @@ const POSTS_PER_PAGE = 5;
 /**
  * Retrieve the initial set of posts to be stored in the post-cache.
  */
-async function getInitialPosts(): Promise<PostCacheType> {
+async function getInitialPosts(setState: (state: State) => void): Promise<void> {
   let firestore = firebase.firestore();
   let postCollection = firestore.collection('posts');
   let postIds = [];
@@ -48,13 +52,19 @@ async function getInitialPosts(): Promise<PostCacheType> {
     postsById[doc.id] = doc.data();
   });
 
-  return { postIds, postsById };
+  setState({
+    postCache: { postIds, postsById },
+    currentPageIds: postIds,
+  });
 }
 
 /**
  * Indicates if there is a next page of posts.
  */
-function hasNextPage(currentPageIds: string[], postIds: string[]): boolean {
+function hasNextPage(state: State): boolean {
+  let { currentPageIds, postCache } = state;
+  let { postIds } = postCache;
+
   if (currentPageIds.length) {
     let lastPostId = currentPageIds[currentPageIds.length - 1];
 
@@ -67,7 +77,10 @@ function hasNextPage(currentPageIds: string[], postIds: string[]): boolean {
 /**
  * Indicates if there is a previous page of posts.
  */
-function hasPrevPage(currentPageIds: string[], postIds: string[]): boolean {
+function hasPrevPage(state: State): boolean {
+  let { currentPageIds, postCache } = state;
+  let { postIds } = postCache;
+
   if (currentPageIds.length) {
     const firstPostId = currentPageIds[0];
 
@@ -78,30 +91,30 @@ function hasPrevPage(currentPageIds: string[], postIds: string[]): boolean {
 }
 
 /**
- * Use the provided hook to set the current page to the previous page.
+ * Set the current page to the previous page.
  */
 function setPrevPage(props: {
-  postCache: PostCacheType;
-  currentPageIds: string[];
-  setCurrentPageIds: (ids: string[]) => void;
+  state: State;
+  setState: (state: State) => void;
 }): void {
-  let { postCache, currentPageIds, setCurrentPageIds } = props;
+  let { state, setState } = props;
+  let { postCache, currentPageIds } = state;
   let { postIds } = postCache;
   let firstPostIndex = postIds.indexOf(currentPageIds[0]);
   let prevPageIds = postIds.slice(firstPostIndex - POSTS_PER_PAGE, firstPostIndex);
 
-  setCurrentPageIds(prevPageIds);
+  setState({ ...state, currentPageIds: prevPageIds });
 }
 
 /**
- * Use the provided hook to set the current page to the next page.
+ * Set the current page to the next page.
  */
 function setNextPage(props: {
-  postCache: PostCacheType;
-  currentPageIds: string[];
-  setCurrentPageIds: (ids: string[]) => void;
+  state: State;
+  setState: (state: State) => void;
 }): void {
-  let { currentPageIds, postCache, setCurrentPageIds } = props;
+  let { state, setState } = props;
+  let { currentPageIds, postCache } = state;
   let { postIds } = postCache;
   let lastPostId = currentPageIds[currentPageIds.length - 1];
   let lastPostIndex = postIds.indexOf(lastPostId);
@@ -109,18 +122,18 @@ function setNextPage(props: {
   let end = lastPostIndex + POSTS_PER_PAGE + 1;
   let nextPageIds = postIds.slice(start, end);
 
-  setCurrentPageIds(nextPageIds);
+  setState({ ...state, currentPageIds: nextPageIds });
 }
 
 /**
  * Retrieve the next page of posts and add them to the cache.
  */
 async function addPostsToCache(props: {
-  currentPageIds: string[];
-  postCache: PostCacheType;
-  setPostCache: (postCache: PostCacheType) => void;
+  state: State;
+  setState: (state: State) => void;
 }): Promise<void> {
-  let { currentPageIds, postCache, setPostCache } = props;
+  let { state, setState } = props;
+  let { currentPageIds, postCache } = state;
   let { postIds, postsById } = postCache;
   let firestore = firebase.firestore();
   let postCollection = firestore.collection('posts');
@@ -143,36 +156,37 @@ async function addPostsToCache(props: {
     newPostsById[doc.id] = doc.data();
   });
 
-  setPostCache({
-    postIds: [...postIds, ...newPostIds],
-    postsById: { ...postsById, ...newPostsById },
+  setState({
+    ...state,
+    postCache: {
+      postIds: [...postIds, ...newPostIds],
+      postsById: { ...postsById, ...newPostsById },
+    },
   });
 }
 
-const Index: NextPage<Props> = function Index(props) {
-  let { initialPosts, theme } = props;
-  let [postCache, setPostCache] = useState(initialPosts);
-  let [currentPageIds, setCurrentPageIds] = useState(initialPosts.postIds);
+const Index: NextPage<Props> = function Index() {
+  let [state, setState] = useState(DEFAULT_STATE);
   let defaultTheme = useContext(ThemeContext);
+  let { postCache, currentPageIds } = state;
 
   useEffect(() => {
-    let { postIds } = postCache;
     let pageIsFull = currentPageIds.length === POSTS_PER_PAGE;
 
-    if (pageIsFull && !hasNextPage(currentPageIds, postIds)) {
-      addPostsToCache({
-        currentPageIds,
-        postCache,
-        setPostCache,
-      });
+    if (!currentPageIds.length) {
+      getInitialPosts(setState);
+    }
+
+    if (pageIsFull && !hasNextPage(state)) {
+      addPostsToCache({ state, setState });
     }
   }, [currentPageIds]);
 
   return (
     <PostCacheContext.Provider value={postCache}>
-      <ThemeContext.Provider value={{ ...defaultTheme, ...theme }}>
+      <ThemeContext.Provider value={defaultTheme}>
         <Layout title={PAGE_TITLE}>
-          {currentPageIds.map(id => (
+          {currentPageIds.map((id) => (
             <PostArticle
               key={id}
               post={postCache.postsById[id]}
@@ -182,15 +196,11 @@ const Index: NextPage<Props> = function Index(props) {
           ))}
 
           <Row>
-            {hasPrevPage(currentPageIds, postCache.postIds) && (
+            {hasPrevPage(state) && (
               <Col xs={4} sm={3} md={2}>
                 <Button
                   onClick={(): void => {
-                    setPrevPage({
-                      postCache,
-                      currentPageIds,
-                      setCurrentPageIds,
-                    });
+                    setPrevPage({ state, setState });
                   }}
                   block
                 >
@@ -199,15 +209,11 @@ const Index: NextPage<Props> = function Index(props) {
               </Col>
             )}
 
-            {hasNextPage(currentPageIds, postCache.postIds) && (
+            {hasNextPage(state) && (
               <Col xs={4} sm={3} md={2}>
                 <Button
                   onClick={(): void => {
-                    setNextPage({
-                      postCache,
-                      currentPageIds,
-                      setCurrentPageIds,
-                    });
+                    setNextPage({ state, setState });
                   }}
                   block
                 >
@@ -220,15 +226,6 @@ const Index: NextPage<Props> = function Index(props) {
       </ThemeContext.Provider>
     </PostCacheContext.Provider>
   );
-};
-
-Index.getInitialProps = async function getInitialProps(): Promise<Props> {
-  let firestore = firebase.firestore();
-  let themesettingsdoc = await firestore.collection('settings').doc('theme').get();
-  let theme = themesettingsdoc.data();
-  let initialPosts = await getInitialPosts();
-
-  return { theme: { header: theme.header }, initialPosts };
 };
 
 export default Index;
