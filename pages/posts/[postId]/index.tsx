@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { NextPage } from 'next';
 import { Alert } from 'reactstrap';
 
+import PostCacheContext from '../../../lib/PostCacheContext';
 import Layout from '../../../components/shared/Layout';
 import firebase from '../../../firebase';
 import PostArticle from '../../../components/posts/PostArticle';
@@ -16,18 +17,16 @@ type Props = {
   postId: string;
 };
 
-// ---------
-// Component
-// ---------
+const Posts: NextPage<Props> = function Posts(props) {
+  let { post, postId } = props;
 
-const Posts: NextPage<Props> = (props) => {
-  const {
-    post,
-    postId,
-  } = props;
+  if (!post) {
+    let postCache = useContext(PostCacheContext);
+    post = postCache.getPost(postId);
+  }
 
-  const title = post ? post.title : 'No Post Found';
-  const initialAlertState: AlertState = {
+  let title = post ? post.title : 'No Post Found';
+  let initialAlertState: AlertState = {
     color: 'success',
     message: '',
     show: false,
@@ -58,26 +57,31 @@ const Posts: NextPage<Props> = (props) => {
 };
 
 Posts.getInitialProps = async (context): Promise<Props> => {
-  const { query } = context;
+  const { req, query } = context;
   const { postId } = query;
-  let post;
 
-  if (postId) {
-    const postRequest = await firebase
-      .firestore()
-      .collection('posts')
-      .doc((postId as string))
-      .get();
+  if (req) {
+    let post;
 
-    if (postRequest.exists) {
-      post = { ...postRequest.data() };
+    if (postId) {
+      const postRequest = await firebase
+        .firestore()
+        .collection('posts')
+        .doc((postId as string))
+        .get();
+
+      if (postRequest.exists) {
+        post = { ...postRequest.data() };
+      }
     }
+
+    return {
+      post,
+      postId: (postId as string),
+    };
   }
 
-  return {
-    post,
-    postId: (postId as string),
-  };
+  return { postId: (postId as string) };
 };
 
 export default Posts;

@@ -8,7 +8,7 @@ import PostEditPage from '../../../components/posts/PostEditPage';
 import PostEditForm from '../../../components/posts/PostEditForm';
 import { getLocalDate, getLocalTime } from '../../../utils/dateUtils';
 import usePostEditActions from '../../../hooks/usePostEditActions';
-import PostCacheContext from '../../../utils/PostCacheContext';
+import PostCacheContext from '../../../lib/PostCacheContext';
 import {
   FormState,
   PostType,
