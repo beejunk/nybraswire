@@ -18,25 +18,27 @@ type Props = {
   submit: () => void;
 }
 
-const PostEditForm: React.FC<Props> = ({
+const PostEditForm: React.FC<Props> = function PostEditForm({
   disableSubmit,
   form,
   updateForm,
   submit,
-}: Props) => {
-  const handlePostChange = (field: string) => (ev: React.ChangeEvent<HTMLInputElement>): void => {
-    updateForm({ ...form, [field]: ev.currentTarget.value });
-  };
+}: Props) {
+  function createPostChangeHandler(field: string) {
+    return function handlePostChange(ev: React.ChangeEvent<HTMLInputElement>): void {
+      updateForm({ ...form, [field]: ev.currentTarget.value });
+    };
+  }
 
-  const handleDateChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
+  function handleDateChange(ev: React.ChangeEvent<HTMLInputElement>): void {
     const postedOnDate = ev.currentTarget.value;
     updateForm({ ...form, postedOnDate });
-  };
+  }
 
-  const handleTimeChange = (ev: React.ChangeEvent<HTMLInputElement>): void => {
+  function handleTimeChange(ev: React.ChangeEvent<HTMLInputElement>): void {
     const postedOnTime = ev.currentTarget.value;
     updateForm({ ...form, postedOnTime });
-  };
+  }
 
   return (
     <Form className="mb-3">
@@ -48,7 +50,7 @@ const PostEditForm: React.FC<Props> = ({
               id="postTitle"
               name="title"
               value={form.title}
-              onChange={handlePostChange('title')}
+              onChange={createPostChangeHandler('title')}
             />
           </FormGroup>
         </Col>
@@ -93,7 +95,7 @@ const PostEditForm: React.FC<Props> = ({
               type="textarea"
               name="body"
               value={form.body}
-              onChange={handlePostChange('body')}
+              onChange={createPostChangeHandler('body')}
             />
           </FormGroup>
         </Col>

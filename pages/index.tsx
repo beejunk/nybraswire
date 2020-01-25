@@ -11,26 +11,20 @@ import { PostCacheType } from '../types/posts';
 import { PostCacheAPI } from '../lib/postCache';
 
 type State = { currentPageIds: string[] };
-
 type ThemeSettings = { header: string };
 
-type Props = {
-  theme: ThemeSettings;
-  initialPosts: PostCacheType;
-}
-
 const PAGE_TITLE = 'Recent Posts';
-
 const POSTS_PER_PAGE = 5;
 
 /**
- * Retrieve the initial set of posts to be stored in the post-cache.
+ * Retrieve the initial set of posts. If a `postCache` object is provided, then
+ * the fetched posts will be added to the cache.
  */
 async function getInitialPosts(props: {
-  setCurrentPageIds: (pageIds: string[]) => void;
-  postCache: PostCacheAPI;
-}): Promise<void> {
-  let { setCurrentPageIds, postCache } = props;
+  postCache?: PostCacheAPI;
+  setCurrentPageIds?: (ids: string[]) => void;
+ } = {}): Promise<PostCacheType> {
+  let { postCache, setCurrentPageIds } = props;
   let firestore = firebase.firestore();
   let postCollection = firestore.collection('posts');
   let postIds = [];
@@ -47,11 +41,19 @@ async function getInitialPosts(props: {
     postsById[doc.id] = doc.data();
   });
 
-  postIds.forEach((postId) => {
-    postCache.addPost(postsById[postId], postId);
-  });
+  // Add posts to cache and set the current page IDs. This will only ever run
+  // client-side.
+  if (postCache) {
+    postIds.forEach((postId) => {
+      postCache.addPost(postsById[postId], postId);
+    });
+  }
 
-  setCurrentPageIds(postIds);
+  if (setCurrentPageIds) {
+    setCurrentPageIds(postIds);
+  }
+
+  return { postIds, postsById };
 }
 
 /**
@@ -164,20 +166,27 @@ async function addPostsToCache(props: {
   });
 }
 
-const Index: NextPage<Props> = function Index() {
+const Index: NextPage<PostCacheType> = function Index(props) {
+  let { postIds, postsById } = props;
   let defaultTheme = useContext(ThemeContext);
   let postCache = useContext(PostCacheContext);
-  let { postIds } = postCache.getCache();
-  let [currentPageIds, setCurrentPageIds] = useState(postIds);
+
+  if (postIds.length) {
+    // Add initial posts to cache if this was server-rendered
+    postIds.forEach((id) => {
+      postCache.addPost(postsById[id], id);
+    });
+  }
+
+  let cachedIds = postCache.getCache().postIds;
+  let [currentPageIds, setCurrentPageIds] = useState(cachedIds);
 
   useEffect(() => {
     let pageIsFull = currentPageIds.length === POSTS_PER_PAGE;
 
     if (!currentPageIds.length) {
-      getInitialPosts({ setCurrentPageIds, postCache });
-    }
-
-    if (pageIsFull && !hasNextPage({ currentPageIds, postCache })) {
+      getInitialPosts({ postCache, setCurrentPageIds });
+    } else if (pageIsFull && !hasNextPage({ currentPageIds, postCache })) {
       // TODO: Maybe add a flag that indicates we've reach the end of the page
       // if no new posts get added?
       addPostsToCache({ currentPageIds, postCache });
@@ -228,6 +237,17 @@ const Index: NextPage<Props> = function Index() {
       </ThemeContext.Provider>
     </PostCacheContext.Provider>
   );
+};
+
+Index.getInitialProps = async function getInitialProps(context): Promise<PostCacheType> {
+  let { req } = context;
+  let initialPosts = { postIds: [], postsById: {} };
+
+  if (req) {
+    initialPosts = await getInitialPosts();
+  }
+
+  return initialPosts;
 };
 
 export default Index;

@@ -32,7 +32,7 @@ const Posts: NextPage<Props> = function Posts(props) {
     show: false,
   };
 
-  const [alert, setAlert] = useState(initialAlertState);
+  let [alert, setAlert] = useState(initialAlertState);
 
   return (
     <Layout title={title}>
@@ -71,7 +71,7 @@ Posts.getInitialProps = async (context): Promise<Props> => {
         .get();
 
       if (postRequest.exists) {
-        post = { ...postRequest.data() };
+        post = postRequest.data();
       }
     }
 

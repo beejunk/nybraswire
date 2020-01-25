@@ -23,41 +23,45 @@ type Props = {
 // Helper functions.
 // -----------------
 
-const validateContent = (form: FormState, post?: PostType): boolean => {
-  const contentHasChanged = post
+function validateContent(form: FormState, post?: PostType): boolean {
+  let contentHasChanged = post
     ? (form.title !== post.title) || (form.body !== post.body)
     : true;
-  const contentIsNotEmpty = (form.title !== '') && (form.body !== '');
+  let contentIsNotEmpty = (form.title !== '') && (form.body !== '');
 
   return contentHasChanged && contentIsNotEmpty;
-};
+}
 
-const getFormStateFromPost = (post: PostType): FormState => ({
-  title: post.title,
-  body: post.body,
-  postedOnDate: getLocalDate(post.postedOn),
-  postedOnTime: getLocalTime(post.postedOn),
-});
+function getFormStateFromPost(post: PostType): FormState {
+  return {
+    title: post.title,
+    body: post.body,
+    postedOnDate: getLocalDate(post.postedOn),
+    postedOnTime: getLocalTime(post.postedOn),
+  };
+}
 
 // ---------
 // Component
 // ---------
 
-const Edit: NextPage<Props> = (props) => {
-  const {
-    post,
-    postId,
-  } = props;
-  const postCache = useContext(PostCacheContext);
-  const activePost = post || postCache.postsById[postId];
+const Edit: NextPage<Props> = function Edit(props) {
+  let { post, postId } = props;
+  let activePost = post;
 
-  const initialState = {
+  if (!post) {
+    let postCache = useContext(PostCacheContext);
+    activePost = postCache.getPost(postId);
+  }
+
+
+  let initialState = {
     alert: { color: 'success', message: '', show: false },
     form: activePost && getFormStateFromPost(activePost),
     preview: false,
   };
 
-  const [postEditState, postActions] = usePostEditActions(initialState);
+  let [postEditState, postActions] = usePostEditActions(initialState);
 
   return (
     <Layout title="Edit Post">
@@ -85,7 +89,7 @@ const Edit: NextPage<Props> = (props) => {
       ) : (
         <p>
           {/* TODO: Create proper post-does-not-exist page */}
-          What are you trying to do?
+          Nothing to see here.
         </p>
       )}
     </Layout>
@@ -93,26 +97,31 @@ const Edit: NextPage<Props> = (props) => {
 };
 
 Edit.getInitialProps = async (context): Promise<Props> => {
-  const { req, query } = context;
-  const { postId } = query;
-  let post;
+  let { req, query } = context;
+  let { postId } = query;
 
-  if (postId && req) {
-    const postRequest = await firebase
-      .firestore()
-      .collection('posts')
-      .doc((postId as string))
-      .get();
+  if (req) {
+    let post;
 
-    if (postRequest.exists) {
-      post = { ...postRequest.data() };
+    if (postId) {
+      let postRequest = await firebase
+        .firestore()
+        .collection('posts')
+        .doc((postId as string))
+        .get();
+
+      if (postRequest.exists) {
+        post = postRequest.data();
+      }
     }
+
+    return {
+      post,
+      postId: (postId as string),
+    };
   }
 
-  return {
-    post,
-    postId: (postId as string),
-  };
+  return { postId: (postId as string) };
 };
 
 export default Edit;

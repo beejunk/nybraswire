@@ -14,13 +14,12 @@ import { FormState } from '../../types/posts';
 // Helper functions.
 // -----------------
 
-const validateContent = (form: FormState): boolean => {
-  const contentIsNotEmpty = (form.title !== '') && (form.body !== '');
-  return contentIsNotEmpty;
-};
+function validateContent(form: FormState): boolean {
+  return (form.title !== '') && (form.body !== '');
+}
 
-const getDefaultFormState = (): FormState => {
-  const now = Date.now();
+function getDefaultFormState(): FormState {
+  let now = Date.now();
 
   return {
     title: '',
@@ -28,16 +27,16 @@ const getDefaultFormState = (): FormState => {
     postedOnDate: getLocalDate(now),
     postedOnTime: getLocalTime(now),
   };
-};
+}
 
-const Create: NextPage = () => {
-  const initialState = {
+const Create: NextPage = function Create() {
+  let initialState = {
     alert: { color: 'success', message: '', show: false },
     form: getDefaultFormState(),
     preview: false,
   };
 
-  const [postEditState, postActions] = usePostEditActions(initialState);
+  let [postEditState, postActions] = usePostEditActions(initialState);
 
   return (
     <Layout title="Edit Post">
