@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import {
   getMonthStr,
@@ -11,7 +11,7 @@ type Props = {
   timestamp: number;
 };
 
-const DateBadge: React.FunctionComponent<Props> = (props) => {
+const DateBadge: React.FunctionComponent<Props> = function DateBadge(props) {
   const { timestamp } = props;
   const { colors } = useContext(ThemeContext);
   const date = new Date(timestamp);
@@ -19,6 +19,11 @@ const DateBadge: React.FunctionComponent<Props> = (props) => {
   const month = getMonthStr(date.getMonth());
   const year = date.getFullYear();
   const time = getFormattedTime(date);
+  const [hasMounted, setHasMounted] = useState(false);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   // TODO: Why is minWidth necessary here?
   return (
@@ -38,10 +43,15 @@ const DateBadge: React.FunctionComponent<Props> = (props) => {
         minWidth: '5rem',
       }}
     >
-      <div css={{ fontSize: '0.5rem', lineHeight: '0.5rem' }}>{year}</div>
-      <div css={{ fontWeight: 700 }}>{month}</div>
-      <div>{dayOfMonth}</div>
-      <div css={{ fontSize: '0.5rem', lineHeight: '0.75rem' }}>{time}</div>
+      {/* Render date client-side only to avoid differences between server/client */}
+      {hasMounted && (
+        <>
+          <div css={{ fontSize: '0.5rem', lineHeight: '0.5rem' }}>{year}</div>
+          <div css={{ fontWeight: 700 }}>{month}</div>
+          <div>{dayOfMonth}</div>
+          <div css={{ fontSize: '0.5rem', lineHeight: '0.75rem' }}>{time}</div>
+        </>
+      )}
     </div>
   );
 };
