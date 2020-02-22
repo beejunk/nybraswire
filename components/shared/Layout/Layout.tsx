@@ -28,7 +28,7 @@ const Layout: React.FC<Props> = ({ title, children }) => (
       <footer>
         <Row className="border-top">
           <Col>
-            <small className="text-muted">Copyright 2019 Brian David</small>
+            <small className="text-muted">Copyright 2019-2020 Brian David</small>
           </Col>
         </Row>
       </footer>
