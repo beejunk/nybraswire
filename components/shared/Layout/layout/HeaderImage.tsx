@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import ThemeContext from '../../../../theme';
+import ThemeContext from '../../../../theme/context';
 
 const HeaderImage: React.FC = () => {
   const { header } = useContext(ThemeContext);

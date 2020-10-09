@@ -6,7 +6,7 @@ import firebase from '../firebase';
 import Layout from '../components/shared/Layout';
 import PostArticle from '../components/posts/PostArticle';
 import PostCacheContext from '../lib/PostCacheContext';
-import ThemeContext from '../theme';
+import ThemeContext from '../theme/context';
 import { PostCacheType } from '../types/posts';
 import { PostCacheAPI } from '../lib/postCache';
 

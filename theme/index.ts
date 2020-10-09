@@ -1,15 +1,6 @@
-import hljs from 'highlight.js/lib/highlight';
-import javascript from 'highlight.js/lib/languages/javascript';
-import bash from 'highlight.js/lib/languages/bash';
-import ini from 'highlight.js/lib/languages/ini';
-import 'highlight.js/styles/solarized-dark.css';
-import { createContext } from 'react';
-import theme from './nybraswire';
+import colors from './colors';
 
-hljs.registerLanguage('javascript', javascript);
-hljs.registerLanguage('bash', bash);
-hljs.registerLanguage('ini', ini);
-
-const ThemeContext = createContext(theme);
-
-export default ThemeContext;
+export default {
+  colors,
+  header: 'https://firebasestorage.googleapis.com/v0/b/nybras-wire-blog.appspot.com/o/images%2Fheader.jpg?alt=media&token=505889b6-03d7-43f4-bad0-e4e4640b3223',
+};

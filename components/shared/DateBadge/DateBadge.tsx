@@ -5,7 +5,7 @@ import {
   appendSuffixToDate,
   getFormattedTime,
 } from '../../../utils/dateUtils';
-import ThemeContext from '../../../theme';
+import ThemeContext from '../../../theme/context';
 
 type Props = {
   timestamp: number;
