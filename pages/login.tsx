@@ -1,7 +1,7 @@
 import React from 'react';
 import { NextPage } from 'next';
 import { Col, Row } from 'reactstrap';
-import FirebaseAuth from 'react-firebaseui/FirebaseAuth';
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 
 import Layout from '../components/shared/Layout';
 import firebase from '../firebase';
@@ -32,7 +32,7 @@ const Login: NextPage = () => {
           </Col>
         ) : (
           <Col>
-            <FirebaseAuth
+            <StyledFirebaseAuth
               uiConfig={uiConfig}
               firebaseAuth={firebase.auth()}
             />
