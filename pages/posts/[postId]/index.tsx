@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { NextPage } from 'next';
+import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import { Alert } from 'reactstrap';
 
 import PostCacheContext from '../../../lib/PostCacheContext';
@@ -56,32 +56,44 @@ const Posts: NextPage<Props> = function Posts(props) {
   );
 };
 
-Posts.getInitialProps = async (context): Promise<Props> => {
-  const { req, query } = context;
-  const { postId } = query;
+const getStaticProps: GetStaticProps = async function getStaticProps(context) {
+  const { postId } = context.params;
 
-  if (req) {
-    let post;
+  const postRequest = await firebase
+    .firestore()
+    .collection('posts')
+    .doc(postId)
+    .get();
 
-    if (postId) {
-      const postRequest = await firebase
-        .firestore()
-        .collection('posts')
-        .doc((postId as string))
-        .get();
+  const post = postRequest.data();
 
-      if (postRequest.exists) {
-        post = postRequest.data();
-      }
-    }
-
-    return {
+  return {
+    props: {
       post,
-      postId: (postId as string),
-    };
-  }
+      postId,
+    },
+  };
+};
 
-  return { postId: (postId as string) };
+const getStaticPaths: GetStaticPaths = async function getStaticPaths() {
+  let firestore = firebase.firestore();
+  let postCollection = firestore.collection('posts');
+  let postIds = [];
+
+  let query = postCollection
+    .orderBy('postedOn', 'desc');
+
+  let querySnapshot = await query.get();
+
+  querySnapshot.forEach((doc) => {
+    postIds.push(doc.id);
+  });
+
+  return {
+    paths: postIds.map((postId) => ({ params: { postId } })),
+    fallback: false,
+  };
 };
 
 export default Posts;
+export { getStaticProps, getStaticPaths };
