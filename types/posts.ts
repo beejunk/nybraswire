@@ -11,16 +11,16 @@ export interface FormState {
   postedOnTime: string;
 }
 
-export interface PostType {
+export type PostType = {
   title: string;
   body: string;
   createdOn: number;
   updatedOn: number;
   postedOn: number;
   published: boolean;
-}
+};
 
-export interface PostCacheType {
+export type PostCacheType = {
   postIds: string[];
   postsById: { [id: string]: PostType };
 }

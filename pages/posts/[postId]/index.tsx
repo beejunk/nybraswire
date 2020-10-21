@@ -1,8 +1,7 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { NextPage, GetStaticProps, GetStaticPaths } from 'next';
 import { Alert } from 'reactstrap';
 
-import PostCacheContext from '../../../lib/PostCacheContext';
 import Layout from '../../../components/shared/Layout';
 import firebase from '../../../firebase';
 import PostArticle from '../../../components/posts/PostArticle';
@@ -19,12 +18,6 @@ type Props = {
 
 const Posts: NextPage<Props> = function Posts(props) {
   let { post, postId } = props;
-
-  if (!post) {
-    let postCache = useContext(PostCacheContext);
-    post = postCache.getPost(postId);
-  }
-
   let title = post ? post.title : 'No Post Found';
   let initialAlertState: AlertState = {
     color: 'success',
